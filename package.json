@@ -1,0 +1,26 @@
+{
+  "name": "file_uploading_stream",
+  "version": "1.0.0",
+  "description": "A package to upload files as streams, with showing progression",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --watch src --exec ts-node src/index.ts",
+    "build":"rm -rf dist && tsc --project tsconfig.json && echo 'Built successfully'",
+    "start":"npm run build && node dist/index.js"
+  },
+  "keywords": [
+    "Stream"
+  ],
+  "author": "Arka",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.2"
+  }
+}
