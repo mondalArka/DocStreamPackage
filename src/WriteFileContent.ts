@@ -18,32 +18,40 @@ class writeFileContent {
         if (this.obj.content.length > 0) {
             let filePath: string = "";
             for (let i = 0; i < this.obj.metaData.length; i++) {
-                
-                this.singleFile(i,this.obj.metaData[i], this.obj.content[i], filePath, this.obj.filesize[i]);
+
+                this.singleFile(i, this.obj.metaData[i], this.obj.content[i], filePath, this.obj.filesize[i]);
 
                 filePath = "";
             }
         }
     }
 
-    singleFile(count:number,metaData: string, content: Buffer, filePath: string, filesize: number): void {
+    singleFile(count: number, metaData: string, content: Buffer, filePath: string, filesize: number): void {
         let header = metaData.split(`filename="`)[1];
         let fileName = header.substring(0, header.indexOf(`"`));
         // this.obj.mimeType.push(metaData.split("Content-Type: ")[1]);
-        
+        let access: boolean = true;
+
+        if (this.options.fileFilter)
+            this.options.fileFilter(this.req, { originalname: fileName, mimetype: metaData.split("Content-Type: ")[1], filesize }, (error: FormfluxError | null, bool: boolean) => {
+                access = this.callBackFilter(error, bool);
+            })
+
+        if (!access) throw new FormfluxError("Invalid file", 400);
+
         this.options.filename(this.req, { originalname: fileName, mimetype: metaData.split("Content-Type: ")[1], filesize }, (error: FormfluxError | null, fileName: string) => {
             this.callBackFilename(error, fileName);
         })
-        
+
         this.obj.fileName.push(fileName);
-        
+
         this.options.destination(
             this.req,
             { originalname: fileName, mimetype: metaData.split("Content-Type: ")[1], filesize },
             (error: FormfluxError | null, filepath: string) => {
-                this.callbackfilepath(error, filepath);
+                this.callBackfilepath(error, filepath);
             }
-        ); // function same as filename
+        );
 
         new setFileContentToReq(this.req, this.obj).setFileNames(
             {
@@ -65,12 +73,19 @@ class writeFileContent {
     }
 
     callBackFilename(error: FormfluxError | null, fileName: string): void {
+        if (error) throw error;
         this.obj.modifiedFileName.push(fileName);
     }
 
-    callbackfilepath(error: FormfluxError | null, filepath: string): void {
+    callBackfilepath(error: FormfluxError | null, filepath: string): void {
+        if (error) throw error;
         let len = this.obj.modifiedFileName.length;
         this.obj.filePath.push(filepath + "/" + `${this.obj.modifiedFileName[len - 1]}`);
+    }
+
+    callBackFilter(error: FormfluxError | null, bool: boolean): boolean {
+        if (error) throw error;
+        return bool;
     }
 }
 

@@ -35,5 +35,10 @@ export interface options {
         file: file,
         cb: (error: Error | null, filepath: string) => void
     ) => void,
+    fileFilter?:(
+        req: Request,
+        file: file,
+        cb: (error: Error | null, bool: boolean) => void
+    )=>void
 
 }
