@@ -3,22 +3,20 @@ import { reqObj } from "./types";
 
 class setFileContentToReq {
     private obj: reqObj;
-    constructor(obj: reqObj) {
+    private req: Request;
+    constructor(req: Request, obj: reqObj) {
+        this.req = req;
         this.obj = obj;
     }
 
-     setFileNames(req: Request): void {
-        if (this.obj.metaData.length > 0) {
-            for (let i = 0; i < this.obj.metaData.length; i++) {
-                req["file"] = req["file"] ? [...req["file"]] : [];
-                req["file"].push({
-                    originalname: this.obj.fileName[i],
-                    mimetype: this.obj.mimeType[i],
-                    filepath: this.obj.filePath[i],
-                    filesize: this.obj.filesize[i]
-                });
-            }
-        }
+    setFileNames(fileObj: any, type: string): void {
+        if (type == "disk")
+            fileObj["filepath"] = fileObj["filepath"];
+        else
+            fileObj["buffer"] = fileObj["buffer"];
+
+        this.req["file"].push(fileObj);
+
     }
 }
 

@@ -12,9 +12,9 @@ class setFileNameToBody {
         for (let i = 0; i < this.obj.metaData.length; i++) {
             if (this.obj.fileName.length > 1) {
                 if (!req.body[`${this.obj.fieldNameFile[i]}`])
-                    req.body[`${this.obj.fieldNameFile[i]}`] = this.obj.fileName[i];
+                    req.body[`${this.obj.fieldNameFile[i]}`] = this.obj.modifiedFileName[i];
                 else
-                    req.body[`${this.obj.fieldNameFile[i]}`] = [req.body[`${this.obj.fieldNameFile[i]}`], this.obj.fileName[i]].flat();
+                    req.body[`${this.obj.fieldNameFile[i]}`] = [req.body[`${this.obj.fieldNameFile[i]}`], this.obj.modifiedFileName[i]].flat();
             }
         }
     }

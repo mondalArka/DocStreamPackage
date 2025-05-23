@@ -9,29 +9,19 @@ export interface reqObj {
     "metaData": Array<string>,
     "mimeType": Array<string>,
     "fieldNameBody": Array<string>,
-    "fileName": Array<string>
+    "fileName": Array<string>,
+    "modifiedFileName": Array<string>,
     "fieldNameFile": Array<string>,
     "filePath": Array<string>,
     "filesize": Array<number>
 }
-
-interface filenameObj {
-    mimetype?: string | null,
-    name: string
-}
-
-interface destinationObj {
-    mimetype?: string | null,
-    path: string
-}
-type NonEmptyArray<T> = [T, ...T[]];
 export interface file {
     mimetype: string,
     originalname: string,
+    filesize: number
 }
 
 export interface options {
-    case: "stream" | "bulk",
     attachFileToReq?: boolean,
     attachFileToReqBody?: boolean,
     filesCount?: number,
@@ -40,6 +30,10 @@ export interface options {
         file: file,
         cb: (error: Error | null, filename: string) => void
     ) => void,
-    destination: NonEmptyArray<destinationObj>
+    destination:  (
+        req: Request,
+        file: file,
+        cb: (error: Error | null, filepath: string) => void
+    ) => void,
 
 }

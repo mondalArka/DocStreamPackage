@@ -9,7 +9,7 @@ import { defaultOptions } from "./defaultOptions";
 import populateReqObj from "./setDatatoReqobj";
 
 class formflux {
-    static formHandle(options: options = defaultOptions) {
+    static diskStrorage(options: options = defaultOptions) {
         return async function (req: Request, res: Response, next: NextFunction) {
             let obj: reqObj = {
                 "originalReq": "",
@@ -20,6 +20,7 @@ class formflux {
                 "mimeType": [],
                 "fieldNameBody": [],
                 "fileName": [],
+                "modifiedFileName": [],
                 "contentBody": [],
                 "fieldNameFile": [],
                 "filePath": [],
@@ -37,6 +38,7 @@ class formflux {
                 buff.push(chunk);
             })
             req.on("end", () => {
+                req["file"] = [];
 
                 obj.modifiedReq = Buffer.concat(buff); // holding the concatinated buffer
                 // console.log("opopopopopop", obj.modifiedReq.toString("utf-8"));
@@ -44,8 +46,8 @@ class formflux {
                 obj.data = obj.modifiedReq.toString("binary")?.split(`--${boundary}`); // separating the boundary
                 obj.data.pop();
                 obj.data.shift();
-                console.log("data", obj.data);
-                console.log("filename", options.filename);
+                // console.log("data", obj.data);
+                // console.log("filename", options.filename);
 
 
                 //*****Defaults*****
@@ -56,25 +58,14 @@ class formflux {
                 new populateReqObj(obj).populate();
 
 
-                switch (options.case) {
-                    case "bulk": {
-                        new writeFileContent(req,obj, options).writeContent();
-                        new setFileContentToReq(obj).setFileNames(req);
-                        if (options.attachFileToReqBody && options.attachFileToReqBody == true)
-                            new setFileNameToBody(obj).setFileNames(req);
 
-                        new setContentToBody(obj).setBody(req);
-                        break;
-                    }
-                    case "stream": {
-                        console.log("stream");
-                        break;
-                    }
+                new writeFileContent(req, obj, options).writeContent();
+                // new setFileContentToReq(obj).setFileNames(req);
+                if (options.attachFileToReqBody && options.attachFileToReqBody == true)
+                    new setFileNameToBody(obj).setFileNames(req);
 
-                    default:
-                        console.error("Invalid option");
-                        break;
-                }
+                new setContentToBody(obj).setBody(req);
+
 
 
                 // console.log("mimes", obj.mimeType);
@@ -111,6 +102,14 @@ class formflux {
                 console.log("file", req["file"]);
                 console.log("filesize", obj.filesize);
                 console.log("meta", obj.metaData);
+                console.log("filename", obj.fileName);
+                console.log("modifiedFileName", obj.modifiedFileName);
+                console.log("filepath", obj.filePath);
+                console.log("mimeme", obj.mimeType);
+
+
+
+
 
                 res.json({ message: "Success" });
             })
