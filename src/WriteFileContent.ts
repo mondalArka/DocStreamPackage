@@ -67,6 +67,9 @@ class writeFileContent {
 
         let writeFile = createWriteStream(this.obj.filePath[count]);
         writeFile.write(content);
+        writeFile.on("error", () => {
+            throw new FormfluxError("File write error", 500);
+        });
         writeFile.on("finish", () => {
             writeFile.end();
         });
