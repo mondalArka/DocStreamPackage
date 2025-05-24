@@ -1,6 +1,6 @@
 import EventEmitter from "node:events";
 import { options, reqObj } from "./types";
-import FormfluxError from "./ErrorClass";
+import FormfluxError from "./FormFluxError";
 
 class ExtractFileContent {
     private obj: reqObj;
@@ -15,13 +15,14 @@ class ExtractFileContent {
         for (let val of this.obj.data) {
             if (val.includes("\r\n\r\n") && val.includes("Content-Type")) {
                 const [meta, content] = val.split("\r\n\r\n");
-                console.log(meta, "vallllllllpppppppppppppppppppppp");
-
                 this.obj.fieldNameFile.push(val.split(`name="`)[1].substring(0, val.split(`name="`)[1].indexOf(`"`)));
                 this.obj.content.push(Buffer.from(content, "binary"));
+                
+                if(this.options.fileSize && Buffer.from(content,"binary").length>this.options.fileSize)
+                    throw new FormfluxError("File size exceeded limit",400);
                 this.obj.metaData.push(meta);
             } else if (!val.includes("Content-Type")) {
-                console.log("in loop", val.split(`name="`)[1]);
+                // console.log("in loop", val.split(`name="`)[1]);
                 // console.log(start, "lpplplpl");
 
                 this.obj.fieldNameBody.push(val.split(`name="`)[1].substring(0, val.split(`name="`)[1].indexOf(`"`)));

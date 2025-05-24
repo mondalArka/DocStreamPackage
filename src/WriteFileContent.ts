@@ -1,8 +1,10 @@
 import { Request } from "express";
 import { options, reqObj } from "./types";
 import { createWriteStream } from "fs";
-import FormfluxError from "./ErrorClass";
+import FormfluxError from "./FormFluxError";
 import setFileContentToReq from "./SetFileContentToReqFile";
+import EventHandlers from "./EventHandlers";
+import path from "path";
 class writeFileContent {
 
     private obj: reqObj
@@ -16,17 +18,12 @@ class writeFileContent {
 
     writeContent(): void {
         if (this.obj.content.length > 0) {
-            let filePath: string = "";
-            for (let i = 0; i < this.obj.metaData.length; i++) {
-
-                this.singleFile(i, this.obj.metaData[i], this.obj.content[i], filePath, this.obj.filesize[i]);
-
-                filePath = "";
-            }
+            for (let i = 0; i < this.obj.metaData.length; i++)
+                this.singleFile(i, this.obj.metaData[i], this.obj.content[i], this.obj.filesize[i]);
         }
     }
 
-    singleFile(count: number, metaData: string, content: Buffer, filePath: string, filesize: number): void {
+    singleFile(count: number, metaData: string, content: Buffer, filesize: number): void {
         let header = metaData.split(`filename="`)[1];
         let fileName = header.substring(0, header.indexOf(`"`));
         // this.obj.mimeType.push(metaData.split("Content-Type: ")[1]);
@@ -67,11 +64,13 @@ class writeFileContent {
 
         let writeFile = createWriteStream(this.obj.filePath[count]);
         writeFile.write(content);
+        writeFile.end();
         writeFile.on("error", () => {
+            writeFile.end();
             throw new FormfluxError("File write error", 500);
         });
-        writeFile.on("finish", () => {
-            writeFile.end();
+        writeFile.on("close", () => {
+            EventHandlers.emitMessage("writeEnd", "write finish");
         });
     }
 
@@ -83,7 +82,7 @@ class writeFileContent {
     callBackfilepath(error: FormfluxError | null, filepath: string): void {
         if (error) throw error;
         let len = this.obj.modifiedFileName.length;
-        this.obj.filePath.push(filepath + "/" + `${this.obj.modifiedFileName[len - 1]}`);
+        this.obj.filePath.push(path.resolve(filepath, `${this.obj.modifiedFileName[len - 1]}`));
     }
 
     callBackFilter(error: FormfluxError | null, bool: boolean): boolean {

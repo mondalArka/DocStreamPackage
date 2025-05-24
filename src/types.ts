@@ -22,9 +22,9 @@ export interface file {
 }
 
 export interface options {
-    attachFileToReq?: boolean,
     attachFileToReqBody?: boolean,
     filesCount?: number,
+    fileSize?:number,
     filename: (
         req: Request,
         file: file,

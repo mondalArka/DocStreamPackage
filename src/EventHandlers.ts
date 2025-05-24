@@ -1,6 +1,6 @@
 import EventEmitter from "node:events";
 
-export class EventHandlers extends EventEmitter {
+ class EventHandlers extends EventEmitter {
     constructor() {
         super();
     }
@@ -8,6 +8,6 @@ export class EventHandlers extends EventEmitter {
     emitMessage(eventName: string, message: string | object) {
         this.emit(eventName, message);
     }
-
-
 }
+
+export default new EventHandlers();

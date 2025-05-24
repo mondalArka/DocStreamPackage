@@ -1,3 +1,4 @@
+import EventHandlers from "./EventHandlers";
 import { reqObj } from "./types";
 import { Request } from "express";
 
@@ -14,6 +15,7 @@ class setContentToBody {
                 req.body[`${this.obj.fieldNameBody[i]}`] = this.obj.contentBody[i];
             }
         }
+        EventHandlers.emitMessage("parseEnd","parse commplete");
     }
 }
 

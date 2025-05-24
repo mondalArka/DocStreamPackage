@@ -10,9 +10,11 @@
         "rootDir": "./src",
         "experimentalDecorators": true,
         "typeRoots": [
+            "./src/types",
             "node_modules/@types"
         ],
-        "emitDecoratorMetadata": true
+        "types": ["node","express"],
+        "emitDecoratorMetadata": true,
     },
     "exclude": [
         "node_modules",

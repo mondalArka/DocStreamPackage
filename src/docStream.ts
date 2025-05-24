@@ -7,10 +7,11 @@ import setFileContentToReq from "./SetFileContentToReqFile";
 import setFileNameToBody from "./setFileNameToBody";
 import { defaultOptions } from "./defaultOptions";
 import populateReqObj from "./setDatatoReqobj";
+import EventHandlers from "./EventHandlers";
 
 class formflux {
-    static diskStrorage(options: options = defaultOptions) {
-        return async function (req: Request, res: Response, next: NextFunction) {
+    static diskStrorage(options: options) {
+        return async function (req: Request, res: Response, next: NextFunction): Promise<void> {
             let obj: reqObj = {
                 "originalReq": "",
                 "modifiedReq": Buffer.from(""),
@@ -31,17 +32,17 @@ class formflux {
             let boundary = req.headers["content-type"]?.split("boundary=")[1];
             console.log("opopopopopop", boundary);
 
-            console.log("objsssss", JSON.stringify(obj, null, 2));
+            // console.log("objsssss", JSON.stringify(obj, null, 2));
 
 
             req.on("data", (chunk: Buffer) => {
                 buff.push(chunk);
             })
             req.on("end", () => {
-                req["file"] = [];
+                req.file = [];
 
                 obj.modifiedReq = Buffer.concat(buff); // holding the concatinated buffer
-                // console.log("opopopopopop", obj.modifiedReq.toString("utf-8"));
+                // console.log("opopopopopop", obj.modifiedReq.toString("utf-8"),req.query,req.params["ids"]);
 
                 obj.data = obj.modifiedReq.toString("binary")?.split(`--${boundary}`); // separating the boundary
                 obj.data.pop();
@@ -57,6 +58,22 @@ class formflux {
                 //To*********SetFileDataToReqObj
                 new populateReqObj(obj).populate();
 
+                let writeBool: boolean = false;
+                let parseBool: boolean = false;
+                let checkCompletion = (writeComplete: boolean, parsecomplete: boolean) => {
+                    if (writeComplete && parsecomplete)
+                        next();
+                }
+
+                EventHandlers.on("parseEnd", (message) => {
+                    parseBool = true;
+                    checkCompletion(writeBool, parseBool);
+                })
+
+                EventHandlers.on("writeEnd", (message) => {
+                    writeBool = true;
+                    checkCompletion(writeBool, parseBool);
+                })
 
 
                 new writeFileContent(req, obj, options).writeContent();
@@ -108,10 +125,6 @@ class formflux {
                 console.log("mimeme", obj.mimeType);
 
 
-
-
-
-                res.json({ message: "Success" });
             })
         }
     }

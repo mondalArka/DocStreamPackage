@@ -1,7 +1,6 @@
 import { options } from "./types";
 
 export let defaultOptions: options = {
-    attachFileToReq: true,
     attachFileToReqBody: false,
     filename: (req, file, cb) => {
         cb(null, file.originalname);
