@@ -7,7 +7,7 @@ const routes = Router();
 
 routes.get("/doc", 
     
-    formflux.diskStrorage(
+   formflux.diskStrorage(
     {
         attachFileToReqBody: true,
         filesCount: 3,
@@ -24,12 +24,12 @@ routes.get("/doc",
             else cb(null, "low" + file.originalname);
         },
         fileFilter: (req, file, cb) => { // optional
-            if (file.mimetype=="image/png")
+            if (file.mimetype=="image/jpg")
                 cb(null, true);
             else cb(new FormfluxError("Not a valid type of file",401), false);
         }
     }
-)
+).any()
 
 ,asyncHandler(async(req,res)=>{
     console.log("body",req.body);
@@ -43,8 +43,8 @@ routes.get("/doc",
 }));
 
 routes.use(async(err,req,res,next)=>{
-    console.log(err.name+"\n"+err.message+"\n"+err.stack);
+    console.log(err.name+"\n"+err.message+"\n"+err.stack,err["statusCode"]);
     
-    res.json({message:err.message})
+    res.status(err["statusCode"]).json({message:err.message})
 })
 export default routes;
