@@ -1,5 +1,5 @@
 import EventHandlers from "./EventHandlers";
-import { reqObj } from "./types";
+import { reqObj } from "./FormFlux.Types";
 import { Request } from "express";
 
 class setContentToBody {

@@ -1,4 +1,4 @@
-import { reqObj } from "./types";
+import { reqObj } from "./FormFlux.Types";
 import * as path from "path";
 class populateReqObj {
     obj: reqObj;

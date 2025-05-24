@@ -1,4 +1,4 @@
-import { options } from "./types";
+import { options } from "./FormFlux.Types";
 
 export let defaultOptions: options = {
     attachFileToReqBody: false,

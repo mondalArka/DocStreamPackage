@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { reqObj } from "./types";
+import { reqObj } from "./FormFlux.Types";
 
 class setFileContentToReq {
     private obj: reqObj;

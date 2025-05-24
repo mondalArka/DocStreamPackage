@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { options, reqObj } from "./types";
+import { options, reqObj } from "./FormFlux.Types";
 import { createWriteStream } from "fs";
 import FormfluxError from "./FormFluxError";
 import setFileContentToReq from "./SetFileContentToReqFile";
@@ -17,10 +17,18 @@ class writeFileContent {
     }
 
     writeContent(): void {
+        let flag = 0;
         if (this.obj.content.length > 0) {
             for (let i = 0; i < this.obj.metaData.length; i++)
-                this.singleFile(i, this.obj.metaData[i], this.obj.content[i], this.obj.filesize[i]);
+                if (this.obj.metaData[i]?.length != 0 && this.obj.content[i]?.length != 0, this.obj.fileName[i]?.length != 0) {
+                    this.singleFile(i, this.obj.metaData[i], this.obj.content[i], this.obj.filesize[i]);
+                    flag++;
+                }
         }
+        if (flag == 0){
+            EventHandlers.emitMessage("writeEnd", "write finish");
+        }
+
     }
 
     singleFile(count: number, metaData: string, content: Buffer, filesize: number): void {

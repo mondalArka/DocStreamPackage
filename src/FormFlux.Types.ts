@@ -1,4 +1,5 @@
 import { Request } from "express";
+import FormfluxError from "./FormFluxError";
 
 export interface reqObj {
     "originalReq": string;
@@ -28,12 +29,12 @@ export interface options {
     filename: (
         req: Request,
         file: file,
-        cb: (error: Error | null, filename: string) => void
+        cb: (error: FormfluxError | null, filename: string) => void
     ) => void,
     destination:  (
         req: Request,
         file: file,
-        cb: (error: Error | null, filepath: string) => void
+        cb: (error: FormfluxError | null, filepath: string) => void
     ) => void,
     fileFilter?:(
         req: Request,
@@ -42,3 +43,11 @@ export interface options {
     )=>void
 
 }
+
+interface fieldObject{
+    name:string,
+    maxCount?:number,
+    filesize?:number
+}
+
+export type optionFields = [fieldObject,...fieldObject[]];
