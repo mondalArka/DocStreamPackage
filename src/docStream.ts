@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { options, reqObj,optionFields } from "./FormFlux.Types";
+import { options, reqObj, optionFields } from "./FormFlux.Types";
 import ExtractFileContent from "./ExtractContent";
 import writeFileContent from "./WriteFileContent";
 import setContentToBody from "./SetBodyContentToReq";
@@ -34,7 +34,10 @@ class formflux {
                     console.log("opopopopopop", boundary);
 
                     // console.log("objsssss", JSON.stringify(obj, null, 2));
-
+                    // setInterval(() => { // heap status check
+                    //     const mem = process.memoryUsage();
+                    //     console.log(`Heap Used: ${(mem.heapUsed / 1024 / 1024).toFixed(2)} MB`);
+                    // }, 50);
 
                     req.on("data", (chunk: Buffer) => {
                         buff.push(chunk);
@@ -58,7 +61,7 @@ class formflux {
 
                             //*****Defaults*****
                             //To*********extract content
-                            new ExtractFileContent(obj, options,null).extraction();
+                            new ExtractFileContent(obj, options, null).extraction();
 
                             //To*********SetFileDataToReqObj
                             new populateReqObj(obj).populate();
@@ -81,7 +84,7 @@ class formflux {
                             })
 
 
-                            new writeFileContent(req, obj, options,"any").writeContent();
+                            new writeFileContent(req, obj, options, "any").writeContent();
                             // new setFileContentToReq(obj).setFileNames(req);
                             if (options.attachFileToReqBody && options.attachFileToReqBody == true)
                                 new setFileNameToBody(obj).setFileNames(req);
@@ -129,13 +132,14 @@ class formflux {
                             console.log("filepath", obj.filePath);
                             console.log("mimeme", obj.mimeType);
                         } catch (err) {
-                            next(err)
+                            next(err);
                         }
                     })
 
                     req.on("error", () => {
                         try {
                             console.error("Error in parsing request");
+                            next(new FormfluxError("Error in recieving request", 500));
                         } catch (err) {
                             next(new FormfluxError("Error in recieving request", 500));
                         }
@@ -143,8 +147,8 @@ class formflux {
 
                 }
             },
-            fields(optionFields:optionFields){
-                 return async function (req: Request, res: Response, next: NextFunction): Promise<void> {
+            fields(optionFields: optionFields) {
+                return async function (req: Request, res: Response, next: NextFunction): Promise<void> {
                     let obj: reqObj = {
                         "originalReq": "",
                         "modifiedReq": Buffer.from(""),
@@ -167,7 +171,10 @@ class formflux {
 
                     // console.log("objsssss", JSON.stringify(obj, null, 2));
 
-
+                    // setInterval(() => { // heap status check
+                    //     const mem = process.memoryUsage();
+                    //     console.log(`Heap Used: ${(mem.heapUsed / 1024 / 1024).toFixed(2)} MB`);
+                    // }, 50);
                     req.on("data", (chunk: Buffer) => {
                         buff.push(chunk);
                     })
@@ -190,7 +197,7 @@ class formflux {
 
                             //*****Defaults*****
                             //To*********extract content
-                            new ExtractFileContent(obj, options,optionFields).extraction();
+                            new ExtractFileContent(obj, options, optionFields).extraction();
 
                             //To*********SetFileDataToReqObj
                             new populateReqObj(obj).populate();
@@ -213,7 +220,7 @@ class formflux {
                             })
 
 
-                            new writeFileContent(req, obj, options,"fields").writeContent();
+                            new writeFileContent(req, obj, options, "fields").writeContent();
                             // new setFileContentToReq(obj).setFileNames(req);
                             if (options.attachFileToReqBody && options.attachFileToReqBody == true)
                                 new setFileNameToBody(obj).setFileNames(req);
@@ -268,6 +275,7 @@ class formflux {
                     req.on("error", () => {
                         try {
                             console.error("Error in parsing request");
+                            next(new FormfluxError("Error in recieving request", 500));
                         } catch (err) {
                             next(new FormfluxError("Error in recieving request", 500));
                         }

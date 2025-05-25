@@ -66,7 +66,7 @@ class ExtractFileContent {
                                 if (item.filesize && !fieldObj[`${item.name}Check`]) {
                                     let rawContent = this.obj.data.filter(x => x.includes(`name="${item.name}"`) && x.includes("Content-Type"));
                                     rawContent.forEach(cont => {
-                                        
+
                                         if (Buffer.from(cont.split("\r\n\r\n")[1], "binary").length > item.filesize)
                                             throw new FormfluxError("File size exceeded limit1", 400);
                                     });
@@ -79,6 +79,7 @@ class ExtractFileContent {
                 }
             }
         }
+        this.obj.data = null;//*******emptying*******
 
         if (this.options?.filesCount && this.obj.content.length > this.options?.filesCount) {
             throw new FormfluxError("Too many files", 429);
