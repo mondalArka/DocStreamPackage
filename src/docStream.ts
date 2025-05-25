@@ -44,7 +44,7 @@ class formflux {
                     // });
                     req.on("end", () => {
                         try {
-                            req.file = [];
+                            // req.file = [];
 
                             obj.modifiedReq = Buffer.concat(buff); // holding the concatinated buffer
                             // console.log("opopopopopop", obj.modifiedReq.toString("utf-8"),req.query,req.params["ids"]);
@@ -81,7 +81,7 @@ class formflux {
                             })
 
 
-                            new writeFileContent(req, obj, options).writeContent();
+                            new writeFileContent(req, obj, options,"any").writeContent();
                             // new setFileContentToReq(obj).setFileNames(req);
                             if (options.attachFileToReqBody && options.attachFileToReqBody == true)
                                 new setFileNameToBody(obj).setFileNames(req);
@@ -176,7 +176,7 @@ class formflux {
                     // });
                     req.on("end", () => {
                         try {
-                            req.file = [];
+                            // req.file = [];
 
                             obj.modifiedReq = Buffer.concat(buff); // holding the concatinated buffer
                             // console.log("opopopopopop", obj.modifiedReq.toString("utf-8"),req.query,req.params["ids"]);
@@ -213,7 +213,7 @@ class formflux {
                             })
 
 
-                            new writeFileContent(req, obj, options).writeContent();
+                            new writeFileContent(req, obj, options,"fields").writeContent();
                             // new setFileContentToReq(obj).setFileNames(req);
                             if (options.attachFileToReqBody && options.attachFileToReqBody == true)
                                 new setFileNameToBody(obj).setFileNames(req);
@@ -226,7 +226,7 @@ class formflux {
                             // console.log("fileNames", obj.fileName);
                             // console.log("contentBody", obj.contentBody);
                             // console.log("contentField", obj.fieldNameBody);
-                            // console.log("contentFileBody", obj.fieldNameFile);
+                            console.log("contentFileBody", obj.fieldNameFile);
                             // console.log("content",obj.content);
 
 

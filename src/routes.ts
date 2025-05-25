@@ -10,8 +10,8 @@ routes.get("/doc",
     
    formflux.diskStrorage(
     {
-        // attachFileToReqBody: true,
-        filesCount: 3,
+        attachFileToReqBody: true,
+        // filesCount: 3,
         // fileSize:580 * 1024, // a little bit bigger than the actual filsize to be filtered
         destination: (req:Request, file:file, cb:(err:FormfluxError| null,filePath:string)=>void) => {
             // if(file.mimetype=="image/png")
@@ -39,11 +39,12 @@ routes.get("/doc",
 .fields([
     {
         name:"docs",
-        maxCount:2
+        maxCount:2,
     },
     {
         name: "profile",
-        maxCount:1
+        maxCount:3,
+        filesize:580*1024
     }
 ])
 
@@ -52,6 +53,10 @@ routes.get("/doc",
     console.log("query",req.query);
     console.log("params",req.params);
     console.log("file",req.file);
+    console.log("type file",typeof req.file);
+    console.log("doc",req.file);
+    
+    
     
     res.json({message:"success"});
     

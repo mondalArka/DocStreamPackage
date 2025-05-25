@@ -10,18 +10,20 @@ class writeFileContent {
     private obj: reqObj
     private options: options
     private req: Request;
-    constructor(req: Request, obj: reqObj, options: options) {
+    private for:"any" | "fields";
+    constructor(req: Request, obj: reqObj, options: options,forReason:"any"| "fields") {
         this.obj = obj;
         this.options = options;
         this.req = req;
+        this.for=forReason;
     }
 
     writeContent(): void {
         let flag = 0;
         if (this.obj.content.length > 0) {
             for (let i = 0; i < this.obj.metaData.length; i++)
-                if (this.obj.metaData[i]?.length != 0 && this.obj.content[i]?.length != 0, this.obj.fileName[i]?.length != 0) {
-                    this.singleFile(i, this.obj.metaData[i], this.obj.content[i], this.obj.filesize[i]);
+                if (this.obj.metaData[i]?.length != 0 && this.obj.content[i]?.length != 0, this.obj.fileName[i]?.length != 0 && this.obj.fieldNameFile[i]?.length!=0) {
+                    this.singleFile(i, this.obj.metaData[i], this.obj.content[i], this.obj.filesize[i],this.obj.fieldNameFile[i]);
                     flag++;
                 }
         }
@@ -31,7 +33,7 @@ class writeFileContent {
 
     }
 
-    singleFile(count: number, metaData: string, content: Buffer, filesize: number): void {
+    singleFile(count: number, metaData: string, content: Buffer, filesize: number,fieldname:string): void {
         let header = metaData.split(`filename="`)[1];
         let fileName = header.substring(0, header.indexOf(`"`));
         // this.obj.mimeType.push(metaData.split("Content-Type: ")[1]);
@@ -58,15 +60,31 @@ class writeFileContent {
             }
         );
 
-        new setFileContentToReq(this.req, this.obj).setFileNames(
+        if(this.for=="any"){
+        new setFileContentToReq(this.req, this.obj,"any").setFileNames(
             {
                 originalname: fileName, mimetype: metaData.split("Content-Type: ")[1],
                 filepath: this.obj.filePath[count],
                 filesize: Buffer.from(content).length,
-                filename: `${this.obj.modifiedFileName[count]}`
+                filename: `${this.obj.modifiedFileName[count]}`,
+                fieldname
             },
-            "disk"
+            "disk",
+            null
         );
+    }else if(this.for="fields"){
+       new setFileContentToReq(this.req, this.obj,"fields").setFileNames(
+            {
+                originalname: fileName, mimetype: metaData.split("Content-Type: ")[1],
+                filepath: this.obj.filePath[count],
+                filesize: Buffer.from(content).length,
+                filename: `${this.obj.modifiedFileName[count]}`,
+                fieldname
+            },
+            "disk",
+            fieldname
+        );
+    }
         if (!this.obj.modifiedFileName[count]) throw new FormfluxError("Filename not found", 404);
         if (!this.obj.filePath[count]) throw new FormfluxError("Destination path not found", 404);
 

@@ -1,6 +1,7 @@
 import EventEmitter from "node:events";
 import { optionFields, options, reqObj } from "./FormFlux.Types";
 import FormfluxError from "./FormFluxError";
+import { raw } from "express";
 
 class ExtractFileContent {
     private obj: reqObj;
@@ -31,7 +32,7 @@ class ExtractFileContent {
                 this.obj.contentBody.push(val?.split("\r\n\r\n")[1].substring(0, val?.split("\r\n\r\n")[1].indexOf("\r\n")));
             }
         }
-        this.obj.data=[]; // **************emptying*********
+        // this.obj.data = []; // **************emptying*********
 
         if (this.fieldArr && this.fieldArr?.length != 0) {
             // console.log("start check");
@@ -40,8 +41,10 @@ class ExtractFileContent {
             let fieldObj = {};
             while (fieldStart <= fieldEnd) {
                 fieldObj[`${this.fieldArr[fieldStart].name}`] = [];
+                fieldObj[`${this.fieldArr[fieldStart].name}Check`] = false;
                 if (fieldStart == fieldEnd) break;
                 fieldObj[`${this.fieldArr[fieldEnd].name}`] = [];
+                fieldObj[`${this.fieldArr[fieldEnd].name}Check`] = false;
                 fieldStart++;
                 fieldEnd--;
             }
@@ -56,7 +59,19 @@ class ExtractFileContent {
                             if (header.substring(0, header.indexOf(`"`)) == item.name) {
                                 fieldObj[item.name].push(1);
                                 count++;
-                                if (fieldObj[item.name].length > item.maxCount) throw new FormfluxError("Too may files",429)
+                                if (item.maxCount && fieldObj[item.name].length > item.maxCount)
+                                    throw new FormfluxError("Too may files", 429);
+
+                                // each field filesize check
+                                if (item.filesize && !fieldObj[`${item.name}Check`]) {
+                                    let rawContent = this.obj.data.filter(x => x.includes(`name="${item.name}"`) && x.includes("Content-Type"));
+                                    rawContent.forEach(cont => {
+                                        
+                                        if (Buffer.from(cont.split("\r\n\r\n")[1], "binary").length > item.filesize)
+                                            throw new FormfluxError("File size exceeded limit1", 400);
+                                    });
+                                    fieldObj[`${item.name}Check`] = true;
+                                }
                             }
                         }
                         if (count <= 0) throw new FormfluxError("Unexpected Field", 400); // invalid field
