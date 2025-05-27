@@ -81,6 +81,43 @@ class ExtractFileContent {
         }
         this.obj.data = null;//*******emptying*******
 
+        //********maxFields validation*******
+        console.log("mata", this.obj.fieldNameBody);
+        console.log("meta2", this.obj.fieldNameFile);
+
+
+        if (this.options?.maxFields) {
+            let countFileFields = 0;
+            let countBodyFields = 0;
+            if (this.obj.fieldNameFile.length > 0) {
+
+                let obj = {};
+                for (let field of this.obj.fieldNameFile) {
+                    if (!Object.keys(obj).includes(`${field}`)) {
+                        obj[`${field}`] = 1;
+                        countFileFields += 1;
+                    }
+                    else continue;
+                }
+                if (countFileFields > this.options.maxFields)
+                    throw new FormfluxError("Too many fields", 429);
+            }
+            if (this.obj.fieldNameBody.length > 0) {
+                let obj = {};
+                for (let field of this.obj.fieldNameBody) {
+                    if (!Object.keys(obj).includes(`${field}`)) {
+                        obj[`${field}`] = 1;
+                        countBodyFields += 1;
+                    }
+                    else continue;
+                }
+                if (countBodyFields > this.options.maxFields)
+                    throw new FormfluxError("Too many fields", 429);
+            }
+            if (countBodyFields + countFileFields > this.options.maxFields)
+                throw new FormfluxError("Too many fields", 429);
+        }
+
         if (this.options?.filesCount && this.obj.content.length > this.options?.filesCount) {
             throw new FormfluxError("Too many files", 429);
         }

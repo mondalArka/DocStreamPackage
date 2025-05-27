@@ -4,13 +4,15 @@ import path from "node:path";
 import FormfluxError from "./FormFluxError";
 import asyncHandler from "./AsyncHandler";
 import { file } from "./FormFlux.Types";
+import { writeFileSync } from "node:fs";
 const routes = Router();
 
 routes.get("/doc", 
     
-   formflux.diskStrorage(
+   formflux.memoryStrorage(
     {
         attachFileToReqBody: true,
+        // maxFields:2, // optional
         // filesCount: 3,
         // fileSize:580 * 1024, // a little bit bigger than the actual filsize to be filtered
         destination: (req:Request, file:file, cb:(err:FormfluxError| null,filePath:string)=>void) => {
@@ -27,9 +29,9 @@ routes.get("/doc",
             // else cb(null, "low" + file.originalname);
         },
         fileFilter: (req, file, cb) => { // optional
-            if (file.filesize<=(8*1024*1024))
+            // if (file.filesize<=(8*1024*1024))
                 cb(null, true);
-            else cb(new FormfluxError("Not a valid type of file",401), false);
+            // else cb(new FormfluxError("Not a valid type of file",401), false);
 
             //  else cb(null,true);
         }
@@ -44,7 +46,7 @@ routes.get("/doc",
     {
         name: "profile",
         maxCount:3,
-        filesize:580*1024
+        // filesize:200*1024*1024
     }
 ])
 
@@ -54,9 +56,11 @@ routes.get("/doc",
     console.log("params",req.params);
     console.log("file",req.file);
     console.log("type file",typeof req.file);
-    console.log("doc",req.file);
+    // console.log("doc",req.file);
     
-    
+    // for(let val of req.file["profile"]){
+    //     writeFileSync(process.cwd()+"/temp/"+val["filename"],val.buffer);
+    // }
     
     res.json({message:"success"});
     

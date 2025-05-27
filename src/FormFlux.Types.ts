@@ -26,6 +26,7 @@ export interface options {
     attachFileToReqBody?: boolean,
     filesCount?: number,
     fileSize?:number,
+    maxFields?:number,
     filename: (
         req: Request,
         file: file,
