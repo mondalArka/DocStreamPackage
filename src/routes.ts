@@ -4,68 +4,116 @@ import path from "node:path";
 import FormfluxError from "./FormFluxError";
 import asyncHandler from "./AsyncHandler";
 import { file } from "./FormFlux.Types";
-import { writeFileSync } from "node:fs";
+import { createWriteStream, write, writeFile, writeFileSync } from "node:fs";
+import MultipartStream from "./Stream";
+import { Writable } from "node:stream";
 const routes = Router();
 
-routes.get("/doc", 
+// routes.get("/doc", 
     
-   formflux.memoryStrorage(
-    {
-        attachFileToReqBody: true,
-        // maxFields:2, // optional
-        // filesCount: 3,
-        // fileSize:580 * 1024, // a little bit bigger than the actual filsize to be filtered
-        destination: (req:Request, file:file, cb:(err:FormfluxError| null,filePath:string)=>void) => {
-            // if(file.mimetype=="image/png")
-            // if (file.mimetype == "image/png")
-            // console.log("tttt",req);
+//    formflux.memoryStrorage(
+//     {
+//         attachFileToReqBody: true,
+//         // maxFields:2, // optional
+//         // filesCount: 3,
+//         // fileSize:580 * 1024, // a little bit bigger than the actual filsize to be filtered
+//         destination: (req:Request, file:file, cb:(err:FormfluxError| null,filePath:string)=>void) => {
+//             // if(file.mimetype=="image/png")
+//             // if (file.mimetype == "image/png")
+//             // console.log("tttt",req);
             
-                cb(null, path.resolve(process.cwd(),"temp"));
-            // else cb(null, path.join(__dirname, "./temporary/other"));
-        },
-        filename: (req, file, cb) => {
-            // if (file.mimetype=="image/jpg")
-                cb(null, Date.now() + file.originalname);
-            // else cb(null, "low" + file.originalname);
-        },
-        fileFilter: (req, file, cb) => { // optional
-            // if (file.filesize<=(8*1024*1024))
-                cb(null, true);
-            // else cb(new FormfluxError("Not a valid type of file",401), false);
+//                 cb(null, path.resolve(process.cwd(),"temp"));
+//             // else cb(null, path.join(__dirname, "./temporary/other"));
+//         },
+//         filename: (req, file, cb) => {
+//             // if (file.mimetype=="image/jpg")
+//                 cb(null, Date.now() + file.originalname);
+//             // else cb(null, "low" + file.originalname);
+//         },
+//         fileFilter: (req, file, cb) => { // optional
+//             // if (file.filesize<=(8*1024*1024))
+//                 cb(null, true);
+//             // else cb(new FormfluxError("Not a valid type of file",401), false);
 
-            //  else cb(null,true);
-        }
-    }
+//             //  else cb(null,true);
+//         }
+//     }
+// )
+// // .any()
+// .fields([
+//     {
+//         name:"docs",
+//         maxCount:2,
+//     },
+//     {
+//         name: "profile",
+//         maxCount:3,
+//         // filesize:200*1024*1024
+//     }
+// ])
+
+routes.get("/doc",
+   async(req,res,next)=>{
+    const streamed= new MultipartStream({
+        "headers":req.headers,
+        filesize:1000000000*1024
+    });
+    let str:Array<Buffer>=[];
+    let c=0;
+    streamed.on("file",(filedname,file,meta)=>{
+        // console.log("11");
+        // console.log(data,c);
+        
+        // console.log("file",filedname);
+        // // console.log("file",file);
+        // console.log("meta",meta.mimeType);
+        // console.log("filename",meta.filename);
+        
+        
+        file.on("data",(chunk)=>{
+            console.log("recieve chunks");
+            str.push(chunk);
+        })
+
+        file.on("finish",()=>{
+            console.log(" file finish");
+        })
+
+        file.on("end",()=>{
+            console.log(" file end");
+        })
+
+        file.pipe(createWriteStream(path.join(__dirname,"./temporary/",meta.filename)));
+        c++;
+    })
+
+    streamed.on("finish",()=>{
+        console.log("stream end");
+    })
+
+
+    // streamed.pipe(req)
+
+    req.pipe(streamed);
+   }
 )
-// .any()
-.fields([
-    {
-        name:"docs",
-        maxCount:2,
-    },
-    {
-        name: "profile",
-        maxCount:3,
-        // filesize:200*1024*1024
-    }
-])
 
-,asyncHandler(async(req,res)=>{
-    console.log("body",req.body);
-    console.log("query",req.query);
-    console.log("params",req.params);
-    console.log("file",req.file);
-    console.log("type file",typeof req.file);
-    // console.log("doc",req.file);
+// asyncHandler(async(req,res)=>{
+//     console.log("body",req.body);
+//     console.log("query",req.query);
+//     console.log("params",req.params);
+//     console.log("file",req.file);
+//     console.log("type file",typeof req.file);
+//     // console.log("doc",req.file);
     
-    // for(let val of req.file["profile"]){
-    //     writeFileSync(process.cwd()+"/temp/"+val["filename"],val.buffer);
-    // }
+//     // for(let val of req.file["profile"]){
+//     //     writeFileSync(process.cwd()+"/temp/"+val["filename"],val.buffer);
+//     // }
     
-    res.json({message:"success"});
+//     res.json({message:"success"});
     
     
-}));
+// });
 
 routes.use(async(err,req,res,next)=>{
     console.log("----------------------");
