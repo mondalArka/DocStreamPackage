@@ -8,11 +8,13 @@ class ExtractFileContent {
     private options: options
     private events: EventEmitter;
     private fieldArr: optionFields | null;
-    constructor(obj: reqObj, options: options, fieldArr: optionFields | null) {
+    private singleObj: string | null;
+    constructor(obj: reqObj, options: options, fieldArr: optionFields | null, singleObj: string | null) {
 
         this.obj = obj;
         this.options = options;
-        this.fieldArr = fieldArr
+        this.fieldArr = fieldArr;
+        this.singleObj = singleObj;
     }
     extraction(): void {
         for (let val of this.obj.data) {
@@ -33,6 +35,25 @@ class ExtractFileContent {
             }
         }
         // this.obj.data = []; // **************emptying*********
+
+        // for single file checks
+        if (this.singleObj) {
+            let count = 0;
+            for (let val of this.obj.metaData) {
+                if (
+                    val.includes("filename") &&
+                    val.split(`name="`)[1].substring(0, val.split(`name="`)[1].indexOf(`"`)) == this.singleObj
+                ) {
+                    count++;
+                    if (count > 1)
+                        throw new FormfluxError("Single file can't be uploaded more than once", 400);
+                }
+                else if (val.includes("filename") && val.split(`name="`)[1].substring(0, val.split(`name="`)[1].indexOf(`"`)) != this.singleObj)
+                    throw new FormfluxError("Unexpected field", 400);
+            }
+            // if (count == 0) // if no file provided then ok
+            //     throw new FormfluxError("Single file not found", 400);
+        }
 
         if (this.fieldArr && this.fieldArr?.length != 0) {
             // console.log("start check");

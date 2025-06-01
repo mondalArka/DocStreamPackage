@@ -38,17 +38,18 @@ routes.get("/doc",
     }
 )
 // .any()
-.fields([
-    {
-        name:"docs",
-        maxCount:2,
-    },
-    {
-        name: "profile",
-        maxCount:3,
-        // filesize:200*1024*1024
-    }
-])
+// .fields([
+//     {
+//         name:"docs",
+//         maxCount:2,
+//     },
+//     {
+//         name: "profile",
+//         maxCount:3,
+//         // filesize:200*1024*1024
+//     }
+// ])
+.single("doc")
 
 ,asyncHandler(async(req,res)=>{
     console.log("body",req.body);
@@ -58,8 +59,9 @@ routes.get("/doc",
     console.log("type file",typeof req.file);
     // console.log("doc",req.file);
     
-    // for(let val of req.file["profile"]){
-    //     writeFileSync(process.cwd()+"/temp/"+val["filename"],val.buffer);
+    // for(let val of req.file[""]){
+    if(req["file"])
+        writeFileSync(process.cwd()+"/temp/"+req.file["filename"],req.file.buffer);
     // }
     
     res.json({message:"success"});

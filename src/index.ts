@@ -7,6 +7,6 @@ const server = createServer(app);
 
 app.use(express.static(path.join(__dirname,"public")));
 app.use(route);
-server.listen(3000, () => {
+server.listen(4000, () => {
     console.log("Server is running on port 3000");
 });

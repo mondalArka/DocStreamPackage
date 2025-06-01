@@ -10,14 +10,16 @@ class writeFileContent {
     private obj: reqObj
     private options: options
     private req: Request;
-    private for: "any" | "fields";
+    private for: "any" | "fields" | "single";
     private storage: "memory" | "disk";
-    constructor(req: Request, obj: reqObj, options: options, forReason: "any" | "fields", storage: "memory" | "disk") {
+    constructor(req: Request, obj: reqObj, options: options, forReason: "any" | "fields" | "single", storage: "memory" | "disk") {
         this.obj = obj;
         this.options = options;
         this.req = req;
         this.for = forReason;
         this.storage = storage;
+        console.log(this.for,"for");
+        
     }
 
     writeContent(): void {
@@ -61,7 +63,8 @@ class writeFileContent {
                 this.callBackfilepath(error, filepath);
             }
         );
-
+        console.log("just this",this.for);
+        
         if (this.for == "any") {
             new setFileContentToReq(this.req, this.obj, "any", this.storage).setFileNames(
                 {
@@ -74,7 +77,9 @@ class writeFileContent {
                 },
                 null
             );
-        } else if (this.for = "fields") {
+        } else if (this.for == "fields") {
+            console.log("yyyyyyyy",this.for);
+            
             new setFileContentToReq(this.req, this.obj, "fields", this.storage).setFileNames(
                 {
                     originalname: fileName, mimetype: metaData.split("Content-Type: ")[1],
@@ -85,6 +90,20 @@ class writeFileContent {
                     buffer: content
                 },
                 fieldname
+            );
+        } else if (this.for == "single") {
+            console.log("cccc",this.for);
+            
+            new setFileContentToReq(this.req, this.obj, "single", this.storage).setFileNames(
+                {
+                    originalname: fileName, mimetype: metaData.split("Content-Type: ")[1],
+                    filepath: this.obj.filePath[count],
+                    filesize: Buffer.from(content).length,
+                    filename: `${this.obj.modifiedFileName[count]}`,
+                    fieldname,
+                    buffer: content
+                },
+                null
             );
         }
         if (!this.obj.modifiedFileName[count]) throw new FormfluxError("Filename not found", 404);
