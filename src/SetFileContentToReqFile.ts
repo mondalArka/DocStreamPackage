@@ -40,7 +40,7 @@ class setFileContentToReq {
             }
 
             case "memory": {
-                if (this.storage == "memory" && this.for == "any") {
+                if (this.for == "any") {
                     console.log("in");
 
                     if (!Array.isArray(this.req["file"])) this.req["file"] = [];

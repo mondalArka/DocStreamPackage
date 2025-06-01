@@ -18,7 +18,6 @@ class writeFileContent {
         this.req = req;
         this.for = forReason;
         this.storage = storage;
-        console.log(this.for,"for");
         
     }
 
@@ -63,7 +62,6 @@ class writeFileContent {
                 this.callBackfilepath(error, filepath);
             }
         );
-        console.log("just this",this.for);
         
         if (this.for == "any") {
             new setFileContentToReq(this.req, this.obj, "any", this.storage).setFileNames(
@@ -77,9 +75,7 @@ class writeFileContent {
                 },
                 null
             );
-        } else if (this.for == "fields") {
-            console.log("yyyyyyyy",this.for);
-            
+        } else if (this.for == "fields") {            
             new setFileContentToReq(this.req, this.obj, "fields", this.storage).setFileNames(
                 {
                     originalname: fileName, mimetype: metaData.split("Content-Type: ")[1],
@@ -92,8 +88,6 @@ class writeFileContent {
                 fieldname
             );
         } else if (this.for == "single") {
-            console.log("cccc",this.for);
-            
             new setFileContentToReq(this.req, this.obj, "single", this.storage).setFileNames(
                 {
                     originalname: fileName, mimetype: metaData.split("Content-Type: ")[1],
