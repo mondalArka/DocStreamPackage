@@ -1,120 +1,167 @@
 import { PassThrough, Readable, Writable } from "stream";
 import FormfluxError from "./FormFluxError";
 import EventEmitter from "events";
-import { createWriteStream, writeFile } from "fs";
-import path from "path";
-import GetHeaders from "./getHeaders";
-import UpperBoundary from "./checkUpperBoundary";
 
-interface PipeableMultipartStream extends EventEmitter {
-    pipe: (req: Readable) => PipeableMultipartStream;
+interface MultipartFileInfo {
+  filename: string;
+  encoding: string;
+  mimeType: string;
 }
+
 class MultipartStream extends Writable {
-    private config: any;
-    private req: Readable;
-    private boundary: Buffer;
-    private state: "PREAMBLE" | "HEADERS" | "CONTENT" | "END" | "CONTENT & HEADERS" | "NEXTDATA" | "NEXTHEADERS" | "NEXTDATA & CONTENT";
-    private consumed: number = 0;
-    private file: any;
-    private fieldName: string;
-    private filestream: PassThrough;
-    private filename: string;
-    private mimetype: string;
-    private bytes: number;
-    constructor(config: any) {
-        super();
-        this.config = config;
-        if (!this.config["headers"]["content-type"].includes("multipart/form-data"))
-            throw new FormfluxError("Invalid content type", 400);
-        this.req = new Readable({ read() { } });
-        this.boundary = Buffer.from("--" + this.config["headers"]["content-type"].split("boundary=")[1]);
-        console.log(this.boundary.toString("binary"), "boundary");
-        console.log(this.config["headers"]["content-type"].split("boundary=")[1], "accbound");
-        // this.filesend = new PassThrough();
-        this.filestream = new PassThrough();
-        this.bytes = 0;
+  private config: any;
+  private boundary: Buffer;
+  private currentState: string;
+  private matched: number = 0;
 
-        // console.log(this.req,"reqqqqqqq");
+  private nextBuff: Buffer = Buffer.alloc(0);
+  private headerBuffer: number[] = [];
+  private bytes: Buffer[] = [];
 
+  private fieldName: string = "";
+  private filename: string = "";
+  private mimetype: string = "";
+  private filestream: PassThrough;
+
+  constructor(config: any) {
+    super();
+    this.config = config;
+
+    const contentType = this.config["headers"]["content-type"];
+    if (!contentType.includes("multipart/form-data")) {
+      throw new FormfluxError("Invalid content type", 400);
     }
 
-    // public pipe(req: Readable): this {
-    //     this.req = req;
-    //     this.setupEventListeners();
-    //     req.pipe(this as any as Writable);
-    //     return this;
-    // }
+    const boundaryStr = contentType.split("boundary=")[1];
+    this.boundary = Buffer.from("--" + boundaryStr, "utf-8"); // prefix required
+    this.currentState = "BOUNDARY";
+  }
 
-    _write(chunk: Buffer, _encoding: string, callback: (err?: Error | null) => void): void {
-        // Here you’d parse the chunk and emit events.
-        // We'll mock the behavior for now.
-        // console.log(chunk.toString("binary"),"chunk");
+  _write(chunk: Buffer, _encoding: string, callback: (err?: Error | null) => void): void {
+    this.handleData(chunk);
+    callback();
+  }
 
-        this.handleData(chunk);
-        callback(); // Tell Node the chunk was processed
+  _final(callback: (err?: Error | null) => void): void {
+    this.handleEnd();
+    callback();
+  }
+
+  private _parseHeaders(rawHeader: string): void {
+    const lines = rawHeader.split("\r\n");
+    for (const line of lines) {
+      const [key, ...rest] = line.split(":");
+      const value = rest.join(":").trim();
+
+      if (/content-disposition/i.test(key)) {
+        const nameMatch = /name="([^"]+)"/.exec(value);
+        const fileMatch = /filename="([^"]+)"/.exec(value);
+        this.fieldName = nameMatch?.[1] || "";
+        this.filename = fileMatch?.[1] || "";
+      }
+
+      if (/content-type/i.test(key)) {
+        this.mimetype = value;
+      }
+    }
+  }
+
+  private handleData(chunk: Buffer): void {
+    // Prepend leftover buffer from last chunk
+    if (this.nextBuff.length > 0) {
+      chunk = Buffer.concat([this.nextBuff, chunk]);
+      this.nextBuff = Buffer.alloc(0);
     }
 
-    _final(callback: (err?: Error | null) => void): void {
-        this.handleEnd();
-        callback(); // Done writing
-    }
+    let i = 0;
 
-    private setupEventListeners(): void {
-        this.req.on("data", (chunk: Buffer) => this.handleData(chunk));
-        this.req.on("end", () => this.handleEnd());
-        this.req.on("error", (err) => this.emit("error", new FormfluxError(`Request error: ${err.message}`, 500)));
-    }
+    while (i < chunk.length) {
+      const byte = chunk[i];
 
-    private handleData(chunk: Buffer): void {
-
-        let boundStat = UpperBoundary.checkUpperBoundary(this.boundary.toString("binary"), chunk);
-        // console.log(typeof boundStat["data"], "boundstat");
-
-        if (boundStat["status"] == "PREAMBLE") {
-            let fieldNameStat = GetHeaders.fieldName(boundStat["data"]);
-            // console.log(fieldNameStat["data"], "fieldNameStat");
-
-            if (fieldNameStat["status"] == "HEADER_FIELDNAME") {
-                let fileNameStat = GetHeaders.filename(fieldNameStat["data"]);
-                // console.log(fileNameStat["data"], "fileNameStat");
-                
-                if (fileNameStat["status"] == "HEADER_FILENAME") {
-                    let mimeTypeStat = GetHeaders.mimetype(fileNameStat["data"]);
-                    if (mimeTypeStat["status"] == "HEADER_MIMETYPE") {
-                        let lastBoundStat = UpperBoundary.checkLowerBoundary(this.boundary.toString("binary"), mimeTypeStat["data"]);
-                        if(lastBoundStat["status"] == "BOUNDARY_END"){
-                            this.filename = fileNameStat["fileName"];
-                            this.mimetype = mimeTypeStat["mimeType"];
-                            this.fieldName = fieldNameStat["fieldName"];
-                            this.filestream = new PassThrough();
-                            this.state = "CONTENT";
-                            this.file = lastBoundStat["data"];
-                        }
-                    }
-                }
-            }
+      if (this.currentState === "BOUNDARY") {
+        if (byte === this.boundary[this.matched]) {
+          this.matched++;
+          if (this.matched === this.boundary.length) {
+            this.matched = 0;
+            this.currentState = "HEADER";
+            i += 1; // Move past boundary
+            continue;
+          }
+        } else if (this.matched > 0) {
+          i -= this.matched;
+          this.matched = 0;
         }
-        console.log("--------------------");
-        
-        // console.log(this.file, "foilesssss");
+      }
 
-        this.emit("file", this.fieldName, this.filestream, {
+      else if (this.currentState === "HEADER") {
+        this.headerBuffer.push(byte);
+        const len = this.headerBuffer.length;
+        if (
+          len >= 4 &&
+          this.headerBuffer[len - 4] === 13 &&
+          this.headerBuffer[len - 3] === 10 &&
+          this.headerBuffer[len - 2] === 13 &&
+          this.headerBuffer[len - 1] === 10
+        ) {
+          const rawHeader = Buffer.from(this.headerBuffer).toString();
+          this._parseHeaders(rawHeader);
+
+          this.headerBuffer = [];
+          this.currentState = "PART_DATA";
+
+          this.filestream = new PassThrough();
+          this.emit("file", this.fieldName, this.filestream, {
             filename: this.filename,
             encoding: "7bit",
             mimeType: this.mimetype,
-        });
+          });
+        }
+      }
 
-        this.filestream.write(Buffer.from(this.file, "binary"));
+      else if (this.currentState === "PART_DATA") {
+        if (byte === this.boundary[this.matched]) {
+          this.matched++;
+          if (this.matched === this.boundary.length) {
+            // Write buffered bytes
+            if (this.bytes.length > 0) {
+              this.filestream.write(Buffer.concat(this.bytes));
+              this.bytes = [];
+            }
+            this.filestream.end();
+
+            this.matched = 0;
+            this.currentState = "HEADER";
+            i += 1;
+            continue;
+          }
+        } else {
+          if (this.matched > 0) {
+            const prev = Buffer.from(this.boundary.subarray(0, this.matched));
+            this.bytes.push(Buffer.from(prev));
+            this.matched = 0;
+          }
+
+          this.bytes.push(Buffer.from([byte]));
+        }
+      }
+
+      i++;
     }
 
-    private handleEnd(): void {
-        this.emit("finish");
+    // Save tail end of chunk in case of boundary split
+    if (this.currentState === "PART_DATA") {
+      const trailing = Buffer.from(chunk.subarray(chunk.length - this.boundary.length));
+      this.nextBuff = trailing;
     }
+  }
 
-
-
-
-
+  private handleEnd(): void {
+    if (this.filestream && this.bytes.length > 0) {
+      this.filestream.write(Buffer.concat(this.bytes));
+      this.filestream.end();
+    }
+    this.emit("finish");
+  }
 }
 
 export default MultipartStream;

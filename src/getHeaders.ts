@@ -46,4 +46,47 @@ export default class GetHeaders {
             status: "CONTENT"
         };
     }
+
+    static headers(boundary:string,chunk: Buffer):Object{
+        if(chunk.toString("binary").includes("Content-Type") && chunk.toString("binary").includes("\r\n\r\n")){
+            let filename= chunk.toString("binary").split("filename=")[1].substring(0, chunk.toString("binary").split("filename=")[1].indexOf(`"`));
+            let fieldname= chunk.toString("binary").split("name=")[1].substring(0, chunk.toString("binary").split("name=")[1].indexOf(`"`));
+            let mimetype= chunk.toString("binary").split("Content-Type: ")[1].substring(0, chunk.toString("binary").split("Content-Type: ")[1].indexOf("\r\n\r\n"));
+            return {
+                filename,
+                fieldname,
+                mimetype,
+                data: Buffer.from(chunk.toString("binary").split(`Content-Type: ${mimetype}\r\n\r\n`)[1],"binary"),
+                status: "HEADER"
+            };
+        }else if (!chunk.toString("binary").includes("Content-disposition") && !chunk.toString("binary").includes(boundary+"--")) {
+            return {
+                data: chunk,
+                status: "CONTENT"
+            };
+        }
+        else if(!chunk.toString("binary").includes("Content-disposition") && chunk.toString("binary").includes(boundary+"--")){
+            return {
+                data: chunk,
+                status: "BOUNDARY_END"
+            };
+        }
+        else if(!chunk.toString("binary").includes(boundary+"--") && !chunk.toString("binary").includes("\r\n") && chunk.toString("binary").includes("Content-disposition")){
+            let file
+            return {
+                data: chunk,
+                status: "HEADER"
+            };
+        }
+        else  if(chunk.includes("Content-disposition") && !chunk.includes("Content-Type") && chunk.includes("\r\n")){
+            return {
+                data: Buffer.from(chunk.toString("binary").substring(chunk.toString("binary").indexOf("\r\n") + 4), "binary"),
+                status: "WAIT_HEADER"
+            };
+        }
+        else return {
+            data: chunk,
+            status: "CONTENT"
+        };
+    }
 }

@@ -1,29 +1,52 @@
 export default class UpperBoundary {
 
     static checkUpperBoundary(boundary: string, chunk: Buffer): Object {
-        if (chunk.toString("binary").startsWith(boundary))
+        if (chunk.toString("binary").includes(boundary) && chunk.toString("binary").includes("\r\n"))
             return {
-                data: chunk.toString("binary").slice(boundary.length),
+                data: Buffer.from(chunk.toString("binary").substring(chunk.toString("binary").indexOf("\r\n")), "binary"),
                 status: "PREAMBLE"
             };
+        else if (chunk.toString("binary").includes(boundary) && !chunk.toString("binary").includes("\r\n"))
+            return {
+                data: Buffer.from(""),
+                status: "PREAMBLE"
+            }
+        else if (!chunk.toString("binary").includes(boundary) && chunk.toString("binary").includes("\r\n"))
+            return {
+                data: chunk.toString("binary").substring(chunk.toString("binary").indexOf("\r\n") + 4),
+                status: "HEADER & CONTENT"
+            };
 
-        return {
-            data: chunk.toString("binary"),
+        else return {
+            data: chunk,
             status: "CONTENT"
         };
     }
 
     static checkLowerBoundary(boundary: string, chunk: Buffer): Object {
-        if (chunk.toString("binary").includes(boundary+"--")){
+        if (chunk.toString("binary").includes(boundary + "--") && !chunk.toString("binary").includes("Content-disposition")) {
             return {
-                data: chunk.toString("binary").split(boundary+"--")[0],
+                data: Buffer.from(chunk.toString("binary").substring(0, chunk.toString("binary").indexOf(boundary + "--")), "binary"),
                 status: "BOUNDARY_END"
             };
         }
-
-        return {
-            data: chunk.toString("binary"),
-            status: "CONTENT"
-        };
+        else if (chunk.toString("binary").includes(boundary + "--") && chunk.toString("binary").includes("Content-disposition")) {
+            return {
+                data: Buffer.from(chunk.toString("binary").substring(0, chunk.toString("binary").indexOf(boundary + "--")), "binary"),
+                nextData: Buffer.from(chunk.toString("binary").substring(chunk.toString("binary").indexOf("\r\n") + 4), "binary"),
+                status: "BOUNDARY_END & NEXTDATA"
+            };
+        }
+        else if (!chunk.toString("binary").includes(boundary + "--") && chunk.toString("binary").includes("\r\n")) {
+            return {
+                data: Buffer.from(chunk.toString("binary").substring(0, chunk.toString("binary").indexOf("\r\n") + 4), "binary"),
+                status: "HEADER & CONTENT"
+            };
+        }
+        else
+            return {
+                data: chunk,
+                status: "CONTENT"
+            };
     }
 }

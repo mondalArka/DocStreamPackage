@@ -83,7 +83,7 @@ routes.get("/doc",
             console.log(" file end");
         })
 
-        file.pipe(createWriteStream(path.join(__dirname,"./temporary/",meta.filename)));
+        file.pipe(createWriteStream(path.join(__dirname,"./public/",meta.filename)));
         c++;
     })
 
