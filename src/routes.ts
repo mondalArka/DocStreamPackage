@@ -11,10 +11,10 @@ routes.get("/doc",
     
    formflux.memoryStrorage(
     {
-        attachFileToReqBody: true,
+        // attachFileToReqBody: true,
         // maxFields:2, // optional
         // filesCount: 3,
-        // fileSize:580 * 1024, // a little bit bigger than the actual filsize to be filtered
+        fileSize:100 * 1024, // a little bit bigger than the actual filsize to be filtered
         destination: (req:Request, file:file, cb:(err:FormfluxError| null,filePath:string)=>void) => {
             // if(file.mimetype=="image/png")
             // if (file.mimetype == "image/png")
@@ -41,12 +41,13 @@ routes.get("/doc",
 // .fields([
 //     {
 //         name:"docs",
-//         maxCount:2,
+//         maxCount:1,
+//         filesize:10000*1024
 //     },
 //     {
 //         name: "profile",
 //         maxCount:3,
-//         // filesize:200*1024*1024
+//         // filesize:100*1024
 //     }
 // ])
 .single("doc")
@@ -60,8 +61,8 @@ routes.get("/doc",
     // console.log("doc",req.file);
     
     // for(let val of req.file[""]){
-    if(req["file"])
-        writeFileSync(process.cwd()+"/temp/"+req.file["filename"],req.file.buffer);
+    // if(req["file"])
+        // writeFileSync(process.cwd()+"/temp/"+req.file["filename"],req.file.buffer);
     // }
     
     res.json({message:"success"});

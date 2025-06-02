@@ -30,8 +30,12 @@ class formflux {
 
                     };
                     let buff: Array<Buffer> = [];
+                    let reqType = req.headers["content-type"];
+                    if (reqType && !reqType.includes("multipart/form-data"))
+                        throw new FormfluxError("Invalid Request Type.Expected multipart/form-data", 400);
+
                     let boundary = req.headers["content-type"]?.split("boundary=")[1];
-                    console.log("opopopopopop", boundary);
+                    // console.log("opopopopopop", boundary);
 
                     // console.log("objsssss", JSON.stringify(obj, null, 2));
                     // setInterval(() => { // heap status check
@@ -61,7 +65,7 @@ class formflux {
 
                             //*****Defaults*****
                             //To*********extract content
-                            new ExtractFileContent(obj, options, null,null).extraction();
+                            new ExtractFileContent(obj, options, null, null).extraction();
 
                             //To*********SetFileDataToReqObj
                             new populateReqObj(obj).populate();
@@ -84,7 +88,7 @@ class formflux {
                             })
 
 
-                            new writeFileContent(req, obj, options, "any","disk").writeContent();
+                            new writeFileContent(req, obj, options, "any", "disk").writeContent();
                             // new setFileContentToReq(obj).setFileNames(req);
                             if (options.attachFileToReqBody && options.attachFileToReqBody == true)
                                 new setFileNameToBody(obj).setFileNames(req);
@@ -166,6 +170,9 @@ class formflux {
 
                     };
                     let buff: Array<Buffer> = [];
+                    let reqType = req.headers["content-type"];
+                    if (reqType && !reqType.includes("multipart/form-data"))
+                        throw new FormfluxError("Invalid Request Type.Expected multipart/form-data", 400);
                     let boundary = req.headers["content-type"]?.split("boundary=")[1];
                     console.log("opopopopopop", boundary);
 
@@ -197,7 +204,7 @@ class formflux {
 
                             //*****Defaults*****
                             //To*********extract content
-                            new ExtractFileContent(obj, options, optionFields,null).extraction();
+                            new ExtractFileContent(obj, options, optionFields, null).extraction();
 
                             //To*********SetFileDataToReqObj
                             new populateReqObj(obj).populate();
@@ -220,7 +227,7 @@ class formflux {
                             })
 
 
-                            new writeFileContent(req, obj, options, "fields","disk").writeContent();
+                            new writeFileContent(req, obj, options, "fields", "disk").writeContent();
                             // new setFileContentToReq(obj).setFileNames(req);
                             if (options.attachFileToReqBody && options.attachFileToReqBody == true)
                                 new setFileNameToBody(obj).setFileNames(req);
@@ -283,7 +290,7 @@ class formflux {
                 }
             },
 
-            single(field:string) {
+            single(field: string) {
                 return async function (req: Request, res: Response, next: NextFunction): Promise<void> {
                     let obj: reqObj = {
                         "originalReq": "",
@@ -302,6 +309,9 @@ class formflux {
 
                     };
                     let buff: Array<Buffer> = [];
+                    let reqType = req.headers["content-type"];
+                    if (reqType && !reqType.includes("multipart/form-data"))
+                        throw new FormfluxError("Invalid Request Type.Expected multipart/form-data", 400);
                     let boundary = req.headers["content-type"]?.split("boundary=")[1];
                     console.log("opopopopopop", boundary);
 
@@ -333,7 +343,7 @@ class formflux {
 
                             //*****Defaults*****
                             //To*********extract content
-                            new ExtractFileContent(obj, options, null,field).extraction();
+                            new ExtractFileContent(obj, options, null, field).extraction();
 
                             //To*********SetFileDataToReqObj
                             new populateReqObj(obj).populate();
@@ -356,7 +366,7 @@ class formflux {
                             })
 
 
-                            new writeFileContent(req, obj, options, "single","disk").writeContent();
+                            new writeFileContent(req, obj, options, "single", "disk").writeContent();
                             // new setFileContentToReq(obj).setFileNames(req);
                             if (options.attachFileToReqBody && options.attachFileToReqBody == true)
                                 new setFileNameToBody(obj).setFileNames(req);
@@ -443,6 +453,9 @@ class formflux {
 
                     };
                     let buff: Array<Buffer> = [];
+                    let reqType = req.headers["content-type"];
+                    if (reqType && !reqType.includes("multipart/form-data"))
+                        throw new FormfluxError("Invalid Request Type.Expected multipart/form-data", 400);
                     let boundary = req.headers["content-type"]?.split("boundary=")[1];
                     console.log("opopopopopop", boundary);
 
@@ -474,7 +487,7 @@ class formflux {
 
                             //*****Defaults*****
                             //To*********extract content
-                            new ExtractFileContent(obj, options, null,null).extraction();
+                            new ExtractFileContent(obj, options, null, null).extraction();
 
                             //To*********SetFileDataToReqObj
                             new populateReqObj(obj).populate();
@@ -497,7 +510,7 @@ class formflux {
                             })
 
 
-                            new writeFileContent(req, obj, options, "any","memory").writeContent();
+                            new writeFileContent(req, obj, options, "any", "memory").writeContent();
                             // new setFileContentToReq(obj).setFileNames(req);
                             if (options.attachFileToReqBody && options.attachFileToReqBody == true)
                                 new setFileNameToBody(obj).setFileNames(req);
@@ -579,6 +592,9 @@ class formflux {
 
                     };
                     let buff: Array<Buffer> = [];
+                    let reqType = req.headers["content-type"];
+                    if (reqType && !reqType.includes("multipart/form-data"))
+                        throw new FormfluxError("Invalid Request Type.Expected multipart/form-data", 400);
                     let boundary = req.headers["content-type"]?.split("boundary=")[1];
                     console.log("opopopopopop", boundary);
 
@@ -610,7 +626,7 @@ class formflux {
 
                             //*****Defaults*****
                             //To*********extract content
-                            new ExtractFileContent(obj, options, optionFields,null).extraction();
+                            new ExtractFileContent(obj, options, optionFields, null).extraction();
 
                             //To*********SetFileDataToReqObj
                             new populateReqObj(obj).populate();
@@ -633,7 +649,7 @@ class formflux {
                             })
 
 
-                            new writeFileContent(req, obj, options, "fields","memory").writeContent();
+                            new writeFileContent(req, obj, options, "fields", "memory").writeContent();
                             // new setFileContentToReq(obj).setFileNames(req);
                             if (options.attachFileToReqBody && options.attachFileToReqBody == true)
                                 new setFileNameToBody(obj).setFileNames(req);
@@ -695,7 +711,7 @@ class formflux {
                     })
                 }
             },
-             single(field:string) {
+            single(field: string) {
                 return async function (req: Request, res: Response, next: NextFunction): Promise<void> {
                     let obj: reqObj = {
                         "originalReq": "",
@@ -714,6 +730,9 @@ class formflux {
 
                     };
                     let buff: Array<Buffer> = [];
+                    let reqType = req.headers["content-type"];
+                    if (reqType && !reqType.includes("multipart/form-data"))
+                        throw new FormfluxError("Invalid Request Type.Expected multipart/form-data", 400);
                     let boundary = req.headers["content-type"]?.split("boundary=")[1];
                     console.log("opopopopopop", boundary);
 
@@ -745,7 +764,7 @@ class formflux {
 
                             //*****Defaults*****
                             //To*********extract content
-                            new ExtractFileContent(obj, options, null,field).extraction();
+                            new ExtractFileContent(obj, options, null, field).extraction();
 
                             //To*********SetFileDataToReqObj
                             new populateReqObj(obj).populate();
@@ -768,7 +787,7 @@ class formflux {
                             })
 
 
-                            new writeFileContent(req, obj, options, "single","memory").writeContent();
+                            new writeFileContent(req, obj, options, "single", "memory").writeContent();
                             // new setFileContentToReq(obj).setFileNames(req);
                             if (options.attachFileToReqBody && options.attachFileToReqBody == true)
                                 new setFileNameToBody(obj).setFileNames(req);

@@ -23,7 +23,7 @@ class setFileContentToReq {
                     fileObj["filepath"] = fileObj["filepath"];
                     this.req["file"].push(fileObj);
                 }
-                else if ( this.for == "fields") {
+                else if (this.for == "fields") {
                     delete fileObj["buffer"];
                     if (!this.req["file"]) this.req["file"] = {};
                     if (this.req["file"][`${field}`])
@@ -37,12 +37,11 @@ class setFileContentToReq {
                     delete fileObj["buffer"];
                     this.req["file"] = fileObj;
                 }
+                break;
             }
 
             case "memory": {
                 if (this.for == "any") {
-                    console.log("in");
-
                     if (!Array.isArray(this.req["file"])) this.req["file"] = [];
                     fileObj["buffer"] = fileObj["buffer"];
                     this.req["file"].push(fileObj);
@@ -59,6 +58,7 @@ class setFileContentToReq {
                 else if (this.for == "single") {
                     this.req["file"] = fileObj;
                 }
+                break;
             }
         }
 

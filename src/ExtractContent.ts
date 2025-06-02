@@ -46,7 +46,7 @@ class ExtractFileContent {
                 ) {
                     count++;
                     if (count > 1)
-                        throw new FormfluxError("Single file can't be uploaded more than once", 400);
+                        throw new FormfluxError("Too many files", 429);
                 }
                 else if (val.includes("filename") && val.split(`name="`)[1].substring(0, val.split(`name="`)[1].indexOf(`"`)) != this.singleObj)
                     throw new FormfluxError("Unexpected field", 400);
