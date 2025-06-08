@@ -20,13 +20,13 @@ export default function createNewBody(posArr:Array<string>, j:number, data:any):
                 if (!prev) {
                     current = { [`${posArr[i]}`]: data };
                     prev = current;
-                    console.log(JSON.stringify(prev, null, 2), " new prev")
+                    // console.log(JSON.stringify(prev, null, 2), " new prev")
                     // console.log("new current1111", JSON.stringify(current, null, 2))
                 }
                 else {
                     current = { [`${posArr[i]}`]: prev }
                     prev = current;
-                    console.log("new prev", JSON.stringify(prev, null, 2))
+                    // console.log("new prev", JSON.stringify(prev, null, 2))
                     // console.log("new current222222", JSON.stringify(current, null, 2))
                 }
             }
