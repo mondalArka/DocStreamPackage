@@ -1,15 +1,15 @@
 import EventEmitter from "node:events";
-import { optionFields, options, reqObj } from "./FormFlux.Types";
+import { optionFields, options, optionSingle, reqObj } from "./FormFlux.Types";
 import FormfluxError from "./FormFluxError";
 import { raw } from "express";
 
 class ExtractFileContent {
     private obj: reqObj;
-    private options: options
+    private options: options | optionSingle | null
     private events: EventEmitter;
     private fieldArr: optionFields | null;
     private singleObj: string | null;
-    constructor(obj: reqObj, options: options, fieldArr: optionFields | null, singleObj: string | null) {
+    constructor(obj: reqObj, options: options | optionSingle, fieldArr: optionFields | null, singleObj: string | null) {
 
         this.obj = obj;
         this.options = options;
@@ -23,7 +23,7 @@ class ExtractFileContent {
                 this.obj.fieldNameFile.push(val.split(`name="`)[1].substring(0, val.split(`name="`)[1].indexOf(`"`)));
                 this.obj.content.push(Buffer.from(content, "binary"));
 
-                if (this.options["fileSize"] && Buffer.from(content, "binary").length > this.options["fileSize"])
+                if (this.options && this.options["fileSize"] && Buffer.from(content, "binary").length > this.options["fileSize"])
                     throw new FormfluxError("File size exceeded limit", 400);
                 this.obj.metaData.push(meta);
             } else if (!val.includes("Content-Type")) {
@@ -107,7 +107,7 @@ class ExtractFileContent {
         console.log("meta2", this.obj.fieldNameFile);
 
 
-        if (this.options?.maxFields) {
+        if (this.options && this.options?.maxFields) {
             let countFileFields = 0;
             let countBodyFields = 0;
             if (this.obj.fieldNameFile.length > 0) {
@@ -139,7 +139,7 @@ class ExtractFileContent {
                 throw new FormfluxError("Too many fields", 429);
         }
 
-        if (this.options?.filesCount && this.obj.content.length > this.options?.filesCount) {
+        if ( this.options && this.options?.filesCount && this.obj.content.length > this.options?.filesCount) {
             throw new FormfluxError("Too many files", 429);
         }
     }

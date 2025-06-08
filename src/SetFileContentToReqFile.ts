@@ -1,6 +1,6 @@
 import { Request } from "express";
 import { reqObj } from "./FormFlux.Types";
-import { log } from "node:console";
+import FormfluxError from "./FormFluxError";
 
 class setFileContentToReq {
     private obj: reqObj;
@@ -19,18 +19,18 @@ class setFileContentToReq {
             case "disk": {
                 if (this.for == "any") {
                     delete fileObj["buffer"];
-                    if (!Array.isArray(this.req["file"])) this.req["file"] = [];
+                    if (!Array.isArray(this.req["files"])) this.req["files"] = [];
                     fileObj["filepath"] = fileObj["filepath"];
-                    this.req["file"].push(fileObj);
+                    this.req["files"].push(fileObj);
                 }
                 else if (this.for == "fields") {
                     delete fileObj["buffer"];
-                    if (!this.req["file"]) this.req["file"] = {};
-                    if (this.req["file"][`${field}`])
-                        this.req["file"][`${field}`].push(fileObj);
+                    if (!this.req["files"]) this.req["files"] = {};
+                    if (this.req["files"][`${field}`])
+                        this.req["files"][`${field}`].push(fileObj);
                     else {
-                        this.req["file"][`${field}`] = [];
-                        this.req["file"][`${field}`].push(fileObj);
+                        this.req["files"][`${field}`] = [];
+                        this.req["files"][`${field}`].push(fileObj);
                     }
                 }
                 else if (this.for == "single") {
@@ -41,18 +41,19 @@ class setFileContentToReq {
             }
 
             case "memory": {
+                delete fileObj["filepath"];
                 if (this.for == "any") {
-                    if (!Array.isArray(this.req["file"])) this.req["file"] = [];
+                    if (!Array.isArray(this.req["files"])) this.req["files"] = [];
                     fileObj["buffer"] = fileObj["buffer"];
-                    this.req["file"].push(fileObj);
+                    this.req["files"].push(fileObj);
                 }
                 else if (this.for == "fields") {
-                    if (!this.req["file"]) this.req["file"] = {};
-                    if (this.req["file"][`${field}`])
-                        this.req["file"][`${field}`].push(fileObj);
+                    if (!this.req["files"]) this.req["files"] = {};
+                    if (this.req["files"][`${field}`])
+                        this.req["files"][`${field}`].push(fileObj);
                     else {
-                        this.req["file"][`${field}`] = [];
-                        this.req["file"][`${field}`].push(fileObj);
+                        this.req["files"][`${field}`] = [];
+                        this.req["files"][`${field}`].push(fileObj);
                     }
                 }
                 else if (this.for == "single") {
@@ -60,6 +61,8 @@ class setFileContentToReq {
                 }
                 break;
             }
+
+            default: throw new FormfluxError("Invalid storage option", 400);
         }
 
         // else { // for any

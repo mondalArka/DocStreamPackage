@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { options, reqObj } from "./FormFlux.Types";
+import { options, optionSingle, reqObj } from "./FormFlux.Types";
 import { createWriteStream } from "fs";
 import FormfluxError from "./FormFluxError";
 import setFileContentToReq from "./SetFileContentToReqFile";
@@ -8,17 +8,17 @@ import path from "path";
 class writeFileContent {
 
     private obj: reqObj
-    private options: options
+    private options: options | optionSingle;
     private req: Request;
     private for: "any" | "fields" | "single";
     private storage: "memory" | "disk";
-    constructor(req: Request, obj: reqObj, options: options, forReason: "any" | "fields" | "single", storage: "memory" | "disk") {
+    constructor(req: Request, obj: reqObj, options: options | optionSingle, forReason: "any" | "fields" | "single", storage: "memory" | "disk") {
         this.obj = obj;
         this.options = options;
         this.req = req;
         this.for = forReason;
         this.storage = storage;
-        
+
     }
 
     writeContent(): void {
@@ -55,14 +55,16 @@ class writeFileContent {
 
         this.obj.fileName.push(fileName);
 
-        this.options.destination(
-            this.req,
-            { originalname: fileName, mimetype: metaData.split("Content-Type: ")[1], filesize },
-            (error: FormfluxError | null, filepath: string) => {
-                this.callBackfilepath(error, filepath);
-            }
-        );
-        
+        if (this.storage == "disk") {
+            this.options["destination"](
+                this.req,
+                { originalname: fileName, mimetype: metaData.split("Content-Type: ")[1], filesize },
+                (error: FormfluxError | null, filepath: string) => {
+                    this.callBackfilepath(error, filepath);
+                }
+            );
+        }
+
         if (this.for == "any") {
             new setFileContentToReq(this.req, this.obj, "any", this.storage).setFileNames(
                 {
@@ -75,7 +77,7 @@ class writeFileContent {
                 },
                 null
             );
-        } else if (this.for == "fields") {            
+        } else if (this.for == "fields") {
             new setFileContentToReq(this.req, this.obj, "fields", this.storage).setFileNames(
                 {
                     originalname: fileName, mimetype: metaData.split("Content-Type: ")[1],
@@ -101,7 +103,7 @@ class writeFileContent {
             );
         }
         if (!this.obj.modifiedFileName[count]) throw new FormfluxError("Filename not found", 404);
-        if (!this.obj.filePath[count]) throw new FormfluxError("Destination path not found", 404);
+        if (this.storage == "disk" && !this.obj.filePath[count]) throw new FormfluxError("Destination path not found", 404);
 
         if (this.storage == "disk") {
             let writeFile = createWriteStream(this.obj.filePath[count]);

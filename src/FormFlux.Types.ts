@@ -16,7 +16,7 @@ export interface reqObj {
     "filePath": Array<string>,
     "filesize": Array<number>
 }
-export interface file {
+export interface File {
     mimetype: string,
     originalname: string,
     filesize: number
@@ -29,17 +29,35 @@ export interface options {
     maxFields?:number,
     filename: (
         req: Request,
-        file: file,
+        file: File,
         cb: (error: FormfluxError | null, filename: string) => void
     ) => void,
     destination:  (
         req: Request,
-        file: file,
+        file: File,
         cb: (error: FormfluxError | null, filepath: string) => void
     ) => void,
     fileFilter?:(
         req: Request,
-        file: file,
+        file: File,
+        cb: (error: Error | null, bool: boolean) => void
+    )=>void
+
+}
+
+export interface optionSingle {
+    attachFileToReqBody?: boolean,
+    filesCount?: number,
+    fileSize?:number,
+    maxFields?:number,
+    filename: (
+        req: Request,
+        file: File,
+        cb: (error: FormfluxError | null, filename: string) => void
+    ) => void,
+    fileFilter?:(
+        req: Request,
+        file: File,
         cb: (error: Error | null, bool: boolean) => void
     )=>void
 
