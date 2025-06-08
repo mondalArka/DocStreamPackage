@@ -14,7 +14,8 @@ export interface reqObj {
     "modifiedFileName": Array<string>,
     "fieldNameFile": Array<string>,
     "filePath": Array<string>,
-    "filesize": Array<number>
+    "filesize": Array<number>,
+    "streams":Array<any>
 }
 export interface File {
     mimetype: string,

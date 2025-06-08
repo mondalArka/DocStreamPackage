@@ -1,10 +1,11 @@
 import { Request } from "express";
 import { options, optionSingle, reqObj } from "./FormFlux.Types";
-import { createWriteStream } from "fs";
+import { createWriteStream, existsSync, unlinkSync } from "fs";
 import FormfluxError from "./FormFluxError";
 import setFileContentToReq from "./SetFileContentToReqFile";
 import EventHandlers from "./EventHandlers";
 import path from "path";
+import { unlink } from "fs/promises";
 class writeFileContent {
 
     private obj: reqObj
@@ -107,14 +108,27 @@ class writeFileContent {
 
         if (this.storage == "disk") {
             let writeFile = createWriteStream(this.obj.filePath[count]);
+            this.obj.streams.push(writeFile);
             writeFile.write(content);
             writeFile.end();
-            writeFile.on("error", () => {
-                writeFile.end();
-                throw new FormfluxError("File write error", 500);
+            writeFile.on("error", (err) => {
+                for (let i = 0; i < this.obj.streams.length; i++) {
+                    this.obj.streams[i].destroy(err);
+                    // this.obj.streams.shift();
+                    console.log("into",i);
+                    
+                    if (existsSync(this.obj.filePath[i])) unlinkSync(this.obj.filePath[i]);
+                }
+                throw new Error(err.message);
             });
             writeFile.on("close", () => {
                 EventHandlers.emitMessage("writeEnd", "write finish");
+            });
+            EventHandlers.on("parseError", () => {
+                    this.obj.streams[0].destroy(
+                        new FormfluxError("Error in parsing form data.Invalid Format!", 400)
+                    );
+                throw new FormfluxError("Error in parsing form data.Invalid Format!", 400);
             });
         }
     }

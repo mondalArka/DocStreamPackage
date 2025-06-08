@@ -27,7 +27,8 @@ class Formflux {
                         "contentBody": [],
                         "fieldNameFile": [],
                         "filePath": [],
-                        "filesize": []
+                        "filesize": [],
+                        "streams":[]
 
                     };
                     let buff: Array<Buffer> = [];
@@ -167,7 +168,8 @@ class Formflux {
                         "contentBody": [],
                         "fieldNameFile": [],
                         "filePath": [],
-                        "filesize": []
+                        "filesize": [],
+                        "streams":[]
 
                     };
                     let buff: Array<Buffer> = [];
@@ -306,7 +308,8 @@ class Formflux {
                         "contentBody": [],
                         "fieldNameFile": [],
                         "filePath": [],
-                        "filesize": []
+                        "filesize": [],
+                        "streams":[]
 
                     };
                     let buff: Array<Buffer> = [];
@@ -450,7 +453,8 @@ class Formflux {
                         "contentBody": [],
                         "fieldNameFile": [],
                         "filePath": [],
-                        "filesize": []
+                        "filesize": [],
+                        "streams":[]
 
                     };
                     let buff: Array<Buffer> = [];
@@ -589,7 +593,8 @@ class Formflux {
                         "contentBody": [],
                         "fieldNameFile": [],
                         "filePath": [],
-                        "filesize": []
+                        "filesize": [],
+                        "streams":[]
 
                     };
                     let buff: Array<Buffer> = [];
@@ -727,7 +732,8 @@ class Formflux {
                         "contentBody": [],
                         "fieldNameFile": [],
                         "filePath": [],
-                        "filesize": []
+                        "filesize": [],
+                        "streams":[]
 
                     };
                     let buff: Array<Buffer> = [];
@@ -869,7 +875,8 @@ class Formflux {
                         "contentBody": [],
                         "fieldNameFile": [],
                         "filePath": [],
-                        "filesize": []
+                        "filesize": [],
+                        "streams":[]
 
                     };
                     let buff: Array<Buffer> = [];

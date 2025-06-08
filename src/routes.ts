@@ -9,35 +9,35 @@ const routes = Router();
 const request_param= new Formflux();
 routes.get("/doc/:id", 
     
-   Formflux.diskStrorage(
-    {
-        attachFileToReqBody: true,
-        // maxFields:2, // optional
-        // filesCount: 3,
-        // fileSize:100 * 1024, // a little bit bigger than the actual filsize to be filtered
-        destination: (req:Request, file:File, cb:(err:FormfluxError| null,filePath:string)=>void) => {
-            // if(file.mimetype=="image/png")
-            // if (file.mimetype == "image/png")
-            // console.log("tttt",req);
+//    Formflux.diskStrorage(
+//     {
+//         // attachFileToReqBody: true,
+//         // maxFields:2, // optional
+//         // filesCount: 3,
+//         // fileSize:100 * 1024, // a little bit bigger than the actual filsize to be filtered
+//         destination: (req:Request, file:File, cb:(err:FormfluxError| null,filePath:string)=>void) => {
+//             // if(file.mimetype=="image/png")
+//             // if (file.mimetype == "image/png")
+//             // console.log("tttt",req);
             
-                cb(null, path.resolve(process.cwd(),"temp"));
-            // else cb(null, path.join(__dirname, "./temporary/other"));
-        },
-        filename: (req, file, cb) => {
-            // if (file.mimetype=="image/jpg")
-                cb(null, Date.now() + file.originalname);
-            // else cb(null, "low" + file.originalname);
-        },
-        fileFilter: (req, file, cb) => { // optional
-            // if (file.filesize<=(8*1024*1024))
-                cb(null, true);
-            // else cb(new FormfluxError("Not a valid type of file",401), false);
+//                 cb(null, path.resolve(process.cwd(),"temp"));
+//             // else cb(null, path.join(__dirname, "./temporary/other"));
+//         },
+//         filename: (req, file, cb) => {
+//             // if (file.mimetype=="image/jpg")
+//                 cb(null, Date.now() + file.originalname);
+//             // else cb(null, "low" + file.originalname);
+//         },
+//         fileFilter: (req, file, cb) => { // optional
+//             // if (file.filesize<=(8*1024*1024))
+//                 cb(null, true);
+//             // else cb(new FormfluxError("Not a valid type of file",401), false);
 
-            //  else cb(null,true);
-        }
-    }
-)
-.any()
+//             //  else cb(null,true);
+//         }
+//     }
+// )
+// .any()
 // .fields([
 //     {
 //         name:"docs",
@@ -51,7 +51,7 @@ routes.get("/doc/:id",
 //     }
 // ])
 // .single("doc")
-// request_param.bodyParser()
+request_param.bodyParser()
 ,asyncHandler(async(req,res)=>{
     console.log("body",req.body);
     console.log("query",req.query);
