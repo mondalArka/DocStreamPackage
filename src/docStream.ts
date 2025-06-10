@@ -10,7 +10,7 @@ import FormfluxError from "./FormFluxError";
 
 class Formflux {
 
-    static diskStrorage(options: options) {
+    static diskStorage(options: options) {
         return {
             any() {
                 return async function (req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -436,7 +436,7 @@ class Formflux {
         }
     }
 
-    static memoryStrorage(options: optionSingle) {
+    static memoryStorage(options: optionSingle) {
         return {
             any() {
                 return async function (req: Request, res: Response, next: NextFunction): Promise<void> {

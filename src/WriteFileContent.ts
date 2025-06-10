@@ -38,19 +38,21 @@ class writeFileContent {
     }
 
     singleFile(count: number, metaData: string, content: Buffer, filesize: number, fieldname: string): void {
+        console.log("fieldname", fieldname);
+
         let header = metaData.split(`filename="`)[1];
         let fileName = header.substring(0, header.indexOf(`"`));
         // this.obj.mimeType.push(metaData.split("Content-Type: ")[1]);
         let access: boolean = true;
 
         if (this.options.fileFilter)
-            this.options.fileFilter(this.req, { originalname: fileName, mimetype: metaData.split("Content-Type: ")[1], filesize }, (error: FormfluxError | null, bool: boolean) => {
+            this.options.fileFilter(this.req, { originalname: fileName, mimetype: metaData.split("Content-Type: ")[1], filesize, fieldname }, (error: FormfluxError | null, bool: boolean) => {
                 access = this.callBackFilter(error, bool);
             })
 
         if (!access) throw new FormfluxError("Invalid file", 400);
 
-        this.options.filename(this.req, { originalname: fileName, mimetype: metaData.split("Content-Type: ")[1], filesize }, (error: FormfluxError | null, fileName: string) => {
+        this.options.filename(this.req, { originalname: fileName, mimetype: metaData.split("Content-Type: ")[1], filesize, fieldname }, (error: FormfluxError | null, fileName: string) => {
             this.callBackFilename(error, fileName);
         })
 
@@ -115,8 +117,6 @@ class writeFileContent {
                 for (let i = 0; i < this.obj.streams.length; i++) {
                     this.obj.streams[i].destroy(err);
                     // this.obj.streams.shift();
-                    console.log("into",i);
-                    
                     if (existsSync(this.obj.filePath[i])) unlinkSync(this.obj.filePath[i]);
                 }
                 throw new Error(err.message);
@@ -125,9 +125,9 @@ class writeFileContent {
                 EventHandlers.emitMessage("writeEnd", "write finish");
             });
             EventHandlers.on("parseError", () => {
-                    this.obj.streams[0].destroy(
-                        new FormfluxError("Error in parsing form data.Invalid Format!", 400)
-                    );
+                this.obj.streams[0].destroy(
+                    new FormfluxError("Error in parsing form data.Invalid Format!", 400)
+                );
                 throw new FormfluxError("Error in parsing form data.Invalid Format!", 400);
             });
         }
