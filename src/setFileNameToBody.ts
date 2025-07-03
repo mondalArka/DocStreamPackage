@@ -1,9 +1,7 @@
 import { Request } from "express";
 import { reqObj } from "./FormFlux.Types";
 import createNewBody from "./helpers/resBodyMaker";
-import { unlinkSync, existsSync } from "fs";
 import EventHandlers from "./EventHandlers";
-import FormfluxError from "./FormFluxError";
 
 class setFileNameToBody {
     private obj: reqObj

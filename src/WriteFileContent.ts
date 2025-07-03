@@ -5,7 +5,6 @@ import FormfluxError from "./FormFluxError";
 import setFileContentToReq from "./SetFileContentToReqFile";
 import EventHandlers from "./EventHandlers";
 import path from "path";
-import { unlink } from "fs/promises";
 class writeFileContent {
 
     private obj: reqObj
@@ -38,7 +37,7 @@ class writeFileContent {
     }
 
     singleFile(count: number, metaData: string, content: Buffer, filesize: number, fieldname: string): void {
-        
+
         let header = metaData.split(`filename="`)[1];
         let fileName = header.substring(0, header.indexOf(`"`));
         let access: boolean = true;

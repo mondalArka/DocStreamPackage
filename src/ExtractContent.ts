@@ -1,7 +1,6 @@
 import EventEmitter from "node:events";
 import { optionFields, options, optionSingle, reqObj } from "./FormFlux.Types";
 import FormfluxError from "./FormFluxError";
-import { raw } from "express";
 
 class ExtractFileContent {
     private obj: reqObj;
