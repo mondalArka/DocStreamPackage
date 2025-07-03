@@ -76,15 +76,15 @@ router.post(
 export default router;
 ```
 
-## Why FormFlux Instead of Multer?
+## FormFlux Features
 
-Here are some of the unique advantages FormFlux provides over Multer:
+Here are some of the features of FormFlux:
 
 1. **Attach Filenames to `req.body`**
-   - Unlike Multer, FormFlux automatically attaches the uploaded filename to the `req.body` – helpful when saving file metadata to a database.This behavior is enabled when the attachFileToReqBody: true option is set.
+   - FormFlux attaches the uploaded filename to the `req.body` – helpful when saving file metadata to a database.This behavior is enabled when the attachFileToReqBody: true option is set.
 
 2. **File Count Validation**
-   - Enforce `minFileCount` and `maxFileCount` of files **per field** and **globally**. Multer only supports `maxCount`.
+   - Enforce `minFileCount`, `maxFileCount` and `maxFileSize` of files **per field** and **globally**.
 
 3. **File Filtering**
    - Filter incoming files based on:
