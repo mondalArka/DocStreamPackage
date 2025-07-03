@@ -14,41 +14,64 @@ export interface reqObj {
     "modifiedFileName": Array<string>,
     "fieldNameFile": Array<string>,
     "filePath": Array<string>,
-    "filesize": Array<number>
+    "filesize": Array<number>,
+    "streams": Array<any>
 }
-export interface file {
+export interface File {
     mimetype: string,
     originalname: string,
-    filesize: number
+    filesize: number,
+    fieldname: string
 }
 
 export interface options {
     attachFileToReqBody?: boolean,
-    filesCount?: number,
-    fileSize?:number,
-    maxFields?:number,
+    maxFileCount?: number,
+    maxFileSize?: number,
+    maxFields?: number,
+    minFileCount?: number
     filename: (
         req: Request,
-        file: file,
+        file: File,
         cb: (error: FormfluxError | null, filename: string) => void
     ) => void,
-    destination:  (
+    destination: (
         req: Request,
-        file: file,
+        file: File,
         cb: (error: FormfluxError | null, filepath: string) => void
     ) => void,
-    fileFilter?:(
+    fileFilter?: (
         req: Request,
-        file: file,
+        file: File,
         cb: (error: Error | null, bool: boolean) => void
-    )=>void
+    ) => void
 
 }
 
-interface fieldObject{
-    name:string,
-    maxCount?:number,
-    filesize?:number
+export interface optionSingle {
+    attachFileToReqBody?: boolean,
+    maxFileCount?: number,
+    maxFileSize?: number,
+    maxFields?: number,
+    minFileCount?: number
+    filename: (
+        req: Request,
+        file: File,
+        cb: (error: FormfluxError | null, filename: string) => void
+    ) => void,
+    fileFilter?: (
+        req: Request,
+        file: File,
+        cb: (error: Error | null, bool: boolean) => void
+    ) => void
+
 }
 
-export type optionFields = [fieldObject,...fieldObject[]];
+interface fieldObject {
+    name: string,
+    maxFileCount?: number,
+    maxFileSize?: number,
+    minFileCount?: number
+}
+
+export type optionFields = [fieldObject, ...fieldObject[]];

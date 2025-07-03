@@ -1,26 +1,41 @@
 {
-  "name": "file_uploading_stream",
-  "version": "1.0.0",
-  "description": "A package to upload files as streams, with showing progression",
-  "main": "index.js",
+  "name": "formflux",
+  "version": "0.0.1",
+  "description": "A package to upload files to a server and parsing multipart-formData requests",
+  "main": "./dist/FormFlux.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --watch src --exec ts-node src/index.ts",
-    "build":"rm -rf dist && tsc --project tsconfig.json && echo 'Built successfully'",
-    "start":"npm run build && node dist/index.js"
+    "build": "rm -rf dist && tsc --project tsconfig.json && echo 'Built successfully'"
   },
+  "types": "./dist/declarations/FormFlux.d.ts",
   "keywords": [
-    "Stream"
+    "FormFlux",
+    "formflux",
+    "Multer",
+    "multer",
+    "upload",
+    "file",
+    "fileuploading",
+    "file-upload",
+    "express-file-upload",
+    "nodejs",
+    "express",
+    "file handling",
+    "multipart/form-data",
+    "upload middleware",
+    "form data",
+    "REST API",
+    "file upload API",
+    "node file upload",
+    "javascript",
+    "http file upload",
+    "upload handler",
+    "image upload",
+    "document upload",
+    "backend upload"
   ],
   "author": "Arka",
   "license": "ISC",
-  "dependencies": {
-    "express": "^5.1.0",
-    "nodemon": "^3.1.10",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
-  },
-  "devDependencies": {
-    "@types/express": "^5.0.2"
+  "engines": {
+    "node": ">=14.0.0"
   }
 }

@@ -1,13 +1,13 @@
 import { Request } from "express";
 import { reqObj } from "./FormFlux.Types";
-import { log } from "node:console";
+import FormfluxError from "./FormFluxError";
 
 class setFileContentToReq {
     private obj: reqObj;
     private req: Request;
-    private for: "any" | "fields";
+    private for: "any" | "fields" | "single";
     private storage: "memory" | "disk";
-    constructor(req: Request, obj: reqObj, forReason: "any" | "fields", storage: "memory" | "disk") {
+    constructor(req: Request, obj: reqObj, forReason: "any" | "fields" | "single", storage: "memory" | "disk") {
         this.req = req;
         this.obj = obj;
         this.for = forReason;
@@ -18,55 +18,52 @@ class setFileContentToReq {
         switch (this.storage) {
             case "disk": {
                 if (this.for == "any") {
-                    console.log("in");
                     delete fileObj["buffer"];
-                    if (!Array.isArray(this.req["file"])) this.req["file"] = [];
+                    if (!Array.isArray(this.req["files"])) this.req["files"] = [];
                     fileObj["filepath"] = fileObj["filepath"];
-                    this.req["file"].push(fileObj);
+                    this.req["files"].push(fileObj);
                 }
-                else if (this.storage == "disk" && this.for == "fields") {
+                else if (this.for == "fields") {
                     delete fileObj["buffer"];
-                    if (!this.req["file"]) this.req["file"] = {};
-                    if (this.req["file"][`${field}`])
-                        this.req["file"][`${field}`].push(fileObj);
+                    if (!this.req["files"]) this.req["files"] = {};
+                    if (this.req["files"][`${field}`])
+                        this.req["files"][`${field}`].push(fileObj);
                     else {
-                        this.req["file"][`${field}`] = [];
-                        this.req["file"][`${field}`].push(fileObj);
+                        this.req["files"][`${field}`] = [];
+                        this.req["files"][`${field}`].push(fileObj);
                     }
                 }
+                else if (this.for == "single") {
+                    delete fileObj["buffer"];
+                    this.req["file"] = fileObj;
+                }
+                break;
             }
 
             case "memory": {
-                if (this.storage == "memory" && this.for == "any") {
-                    console.log("in");
-
-                    if (!Array.isArray(this.req["file"])) this.req["file"] = [];
+                delete fileObj["filepath"];
+                if (this.for == "any") {
+                    if (!Array.isArray(this.req["files"])) this.req["files"] = [];
                     fileObj["buffer"] = fileObj["buffer"];
-                    this.req["file"].push(fileObj);
+                    this.req["files"].push(fileObj);
                 }
-                else if (this.storage == "memory" && this.for == "fields") {
-                    if (!this.req["file"]) this.req["file"] = {};
-                    if (this.req["file"][`${field}`])
-                        this.req["file"][`${field}`].push(fileObj);
+                else if (this.for == "fields") {
+                    if (!this.req["files"]) this.req["files"] = {};
+                    if (this.req["files"][`${field}`])
+                        this.req["files"][`${field}`].push(fileObj);
                     else {
-                        this.req["file"][`${field}`] = [];
-                        this.req["file"][`${field}`].push(fileObj);
+                        this.req["files"][`${field}`] = [];
+                        this.req["files"][`${field}`].push(fileObj);
                     }
                 }
+                else if (this.for == "single") {
+                    this.req["file"] = fileObj;
+                }
+                break;
             }
+
+            default: throw new FormfluxError("Invalid storage option", 400);
         }
-
-        // else { // for any
-        //     console.log("out");
-
-        //     if(!Array.isArray(this.req["file"])) this.req["file"]=[]; 
-        //     fileObj["buffer"] = fileObj["buffer"];
-        //     this.req["file"].push(fileObj);
-        // }
-
-
-
-
     }
 }
 

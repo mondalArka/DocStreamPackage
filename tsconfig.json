@@ -5,7 +5,6 @@
         "moduleResolution": "node",
         "esModuleInterop": true,
         "sourceMap": true,
-        // "strict": true,
         "outDir": "./dist",
         "rootDir": "./src",
         "experimentalDecorators": true,
@@ -13,8 +12,13 @@
             "./src/types",
             "node_modules/@types"
         ],
-        "types": ["node","express"],
+        "types": [
+            "node",
+            "express"
+        ],
         "emitDecoratorMetadata": true,
+        "declaration": true,
+        "declarationDir": "./dist/declarations"
     },
     "exclude": [
         "node_modules",
