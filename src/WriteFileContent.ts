@@ -38,11 +38,9 @@ class writeFileContent {
     }
 
     singleFile(count: number, metaData: string, content: Buffer, filesize: number, fieldname: string): void {
-        console.log("fieldname", fieldname);
-
+        
         let header = metaData.split(`filename="`)[1];
         let fileName = header.substring(0, header.indexOf(`"`));
-        // this.obj.mimeType.push(metaData.split("Content-Type: ")[1]);
         let access: boolean = true;
 
         if (this.options.fileFilter)
@@ -116,7 +114,6 @@ class writeFileContent {
             writeFile.on("error", (err) => {
                 for (let i = 0; i < this.obj.streams.length; i++) {
                     this.obj.streams[i].destroy(err);
-                    // this.obj.streams.shift();
                     if (existsSync(this.obj.filePath[i])) unlinkSync(this.obj.filePath[i]);
                 }
                 throw new Error(err.message);

@@ -64,18 +64,6 @@ class setFileContentToReq {
 
             default: throw new FormfluxError("Invalid storage option", 400);
         }
-
-        // else { // for any
-        //     console.log("out");
-
-        //     if(!Array.isArray(this.req["file"])) this.req["file"]=[]; 
-        //     fileObj["buffer"] = fileObj["buffer"];
-        //     this.req["file"].push(fileObj);
-        // }
-
-
-
-
     }
 }
 

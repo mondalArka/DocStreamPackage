@@ -17,15 +17,12 @@ class setContentToBody {
                 for (let i = 0; i < this.obj.contentBody.length; i++) {
                     if (/\[.*\]/.test(this.obj.fieldNameBody[i])) {
                         this.nestedData(req, this.obj.fieldNameBody[i], this.obj.contentBody[i]);
-                    } else {
-                        // console.log(this.obj.fieldNameBody[i], this.obj.contentBody[i], "most else values");
+                    } else
                         req.body[`${this.obj.fieldNameBody[i]}`] = this.obj.contentBody[i];
-                    }
                 }
             }
             EventHandlers.emitMessage("parseEnd", "parse commplete");
         } catch (err) {
-            // console.log(err, "Error");
             throw new FormfluxError("Error in parsing form data.Invalid Format!", 400);
         }
     }
@@ -43,24 +40,20 @@ class setContentToBody {
                     if (!prev) {
                         current = [data]
                         prev = current;
-                        // console.log("current", JSON.stringify(current, null, 2))
                     }
                     else {
                         current = [prev]
                         prev = current;
-                        // console.log("current", JSON.stringify(current, null, 2))
                     }
                 }
                 else {
                     if (!prev) {
                         current = { [`${temp[i]}`]: data };
                         prev = current;
-                        console.log(JSON.stringify(prev, null, 2), "prev")
                     }
                     else {
                         current = { [`${temp[i]}`]: prev }
                         prev = current;
-                        // console.log("prev", JSON.stringify(prev, null, 2))
                     }
                 }
             }
@@ -77,36 +70,24 @@ class setContentToBody {
         if (i == posArr.length - 1) {  // reached last position set the value
             if (Array.isArray(obj)) {
                 if (!isNaN(posArr[i])) { // if the current position is a number then it is an array
-                    // console.log("lplplplpl");
-
                     obj[posArr[i]] ? obj[posArr[i]] = data : obj.push(data);
                     return;
                 } else {
-                    // console.log("jhjhjhhjhhjhjhj");
-
                     obj[posArr[i]] = data // needs some checking
                     return;
                 }
             } else { // it is an objct
-                // console.log("in inner else part ", obj, posArr[i], posArr[i]);
-                // console.log("in inner else part return ", createNewBody(posArr, i + 1, data));
-                obj[posArr[i]]=data;
+                obj[posArr[i]] = data;
                 return;
             }
         }
 
         if (!obj[posArr[i]]) {
             if (!isNaN(posArr[i])) {
-                // console.log(createNewBody(posArr, i + 1, data), "cretaed");
                 obj[posArr[i]] = createNewBody(posArr, i + 1, data); // create the rest
-                // console.log("returning now");
-
                 return;
             }
             else {
-                // console.log("in other else part ", obj, posArr[i], posArr[i]);
-                // console.log("in other else part return ", createNewBody(posArr, i + 1, data));
-
                 obj[posArr[i]] = createNewBody(posArr, i + 1, data);
                 return;
             }

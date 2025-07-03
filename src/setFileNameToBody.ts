@@ -20,11 +20,6 @@ class setFileNameToBody {
                     if (/\[.*\]/.test(this.obj.fieldNameFile[i])) {
                         this.nestedData(req, this.obj.fieldNameFile[i], this.obj.fileName[i]);
                     } 
-                    // else {
-                    //     // console.log(this.obj.fieldNameBody[i], this.obj.contentBody[i], "most else values");
-                    //     req.body[`${this.obj.fieldNameFile[i]}`] = this.obj.modifiedFileName[i];
-                    // }
-
                     if (!req.body[`${this.obj.fieldNameFile[i]}`] && !/\[.*\]/.test(this.obj.fieldNameFile[i]))
                         req.body[`${this.obj.fieldNameFile[i]}`] = this.obj.modifiedFileName[i];
                     else if (req.body[`${this.obj.fieldNameFile[i]}`] && !/\[.*\]/.test(this.obj.fieldNameFile[i]))
@@ -50,24 +45,20 @@ class setFileNameToBody {
                     if (!prev) {
                         current = [data]
                         prev = current;
-                        // console.log("current", JSON.stringify(current, null, 2))
                     }
                     else {
                         current = [prev]
                         prev = current;
-                        // console.log("current", JSON.stringify(current, null, 2))
                     }
                 }
                 else {
                     if (!prev) {
                         current = { [`${temp[i]}`]: data };
                         prev = current;
-                        console.log(JSON.stringify(prev, null, 2), "prev")
                     }
                     else {
                         current = { [`${temp[i]}`]: prev }
                         prev = current;
-                        // console.log("prev", JSON.stringify(prev, null, 2))
                     }
                 }
             }
@@ -84,19 +75,13 @@ class setFileNameToBody {
         if (i == posArr.length - 1) {  // reached last position set the value
             if (Array.isArray(obj)) {
                 if (!isNaN(posArr[i])) { // if the current position is a number then it is an array
-                    // console.log("lplplplpl");
-
                     obj[posArr[i]] ? obj[posArr[i]] = data : obj.push(data);
                     return;
                 } else {
-                    // console.log("jhjhjhhjhhjhjhj");
-
                     obj[posArr[i]] = data // needs some checking
                     return;
                 }
             } else { // it is an objct
-                // console.log("in inner else part ", obj, posArr[i], posArr[i]);
-                // console.log("in inner else part return ", createNewBody(posArr, i + 1, data));
                 obj[posArr[i]] = data;
                 return;
             }
@@ -104,16 +89,10 @@ class setFileNameToBody {
 
         if (!obj[posArr[i]]) {
             if (!isNaN(posArr[i])) {
-                // console.log(createNewBody(posArr, i + 1, data), "cretaed");
                 obj[posArr[i]] = createNewBody(posArr, i + 1, data); // create the rest
-                // console.log("returning now");
-
                 return;
             }
             else {
-                // console.log("in other else part ", obj, posArr[i], posArr[i]);
-                // console.log("in other else part return ", createNewBody(posArr, i + 1, data));
-
                 obj[posArr[i]] = createNewBody(posArr, i + 1, data);
                 return;
             }

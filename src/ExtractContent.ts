@@ -27,14 +27,10 @@ class ExtractFileContent {
                     throw new FormfluxError("File size exceeded limit", 400);
                 this.obj.metaData.push(meta);
             } else if (!val.includes("Content-Type")) {
-                // console.log("in loop", val.split(`name="`)[1]);
-                // console.log(start, "lpplplpl");
-
                 this.obj.fieldNameBody.push(val.split(`name="`)[1].substring(0, val.split(`name="`)[1].indexOf(`"`)));
                 this.obj.contentBody.push(val?.split("\r\n\r\n")[1].substring(0, val?.split("\r\n\r\n")[1].indexOf("\r\n")));
             }
         }
-        // this.obj.data = []; // **************emptying*********
 
         // for single file checks
         if (this.singleObj) {
@@ -51,8 +47,6 @@ class ExtractFileContent {
                 else if (val.includes("filename") && val.split(`name="`)[1].substring(0, val.split(`name="`)[1].indexOf(`"`)) != this.singleObj)
                     throw new FormfluxError("Unexpected field", 400);
             }
-            // if (count == 0) // if no file provided then ok
-            //     throw new FormfluxError("Single file not found", 400);
         }
         // check maxfileCount
         if (this.options && this.options?.maxFileCount) {
@@ -74,7 +68,6 @@ class ExtractFileContent {
 
         //check each fields
         if (this.fieldArr && this.fieldArr?.length != 0) {
-            // console.log("start check");
             let fieldStart = 0;
             let fieldEnd = this.fieldArr.length - 1;
             let fieldObj = {};
@@ -109,7 +102,6 @@ class ExtractFileContent {
 
                                 // set the minCountfield
                                 if (item.minFileCount && !fieldObj[`${item.name}minCount`]) {
-                                    // fieldObj[`${item.name}minCount`] = item.minFileCount;
                                     isCountField = true;
                                 }
 
@@ -128,9 +120,6 @@ class ExtractFileContent {
                         if (count <= 0) throw new FormfluxError("Unexpected Field", 400); // invalid field
                     }
                 }
-                // console.log("this field obj", fieldObj);
-                // console.log("this field arr", this.fieldArr);
-                // console.log("this field arr", this.fieldArr[0].minFileCount);
 
                 if (isCountField) {
                     let i = 0;
