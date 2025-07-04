@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { options, reqObj, optionFields, optionSingle } from "./FormFlux.Types";
+import { options, reqObj, optionFields, optionSingle, File } from "./FormFlux.Types";
 import ExtractFileContent from "./ExtractContent";
 import writeFileContent from "./WriteFileContent";
 import setContentToBody from "./SetBodyContentToReq";
@@ -28,7 +28,7 @@ class Formflux {
                         "fieldNameFile": [],
                         "filePath": [],
                         "filesize": [],
-                        "streams":[]
+                        "streams": []
 
                     };
                     let buff: Array<Buffer> = [];
@@ -86,7 +86,7 @@ class Formflux {
                     })
 
                     req.on("error", () => {
-                            next(new FormfluxError("Error in recieving request", 500));
+                        next(new FormfluxError("Error in recieving request", 500));
                     })
 
                 }
@@ -107,7 +107,7 @@ class Formflux {
                         "fieldNameFile": [],
                         "filePath": [],
                         "filesize": [],
-                        "streams":[]
+                        "streams": []
 
                     };
                     let buff: Array<Buffer> = [];
@@ -158,14 +158,14 @@ class Formflux {
                                 new setFileNameToBody(obj).setFileNames(req);
 
                             new setContentToBody(obj).setBody(req);
-                            
+
                         } catch (err) {
                             next(err)
                         }
                     })
 
                     req.on("error", () => {
-                            next(new FormfluxError("Error in recieving request", 500));
+                        next(new FormfluxError("Error in recieving request", 500));
                     })
                 }
             },
@@ -186,7 +186,7 @@ class Formflux {
                         "fieldNameFile": [],
                         "filePath": [],
                         "filesize": [],
-                        "streams":[]
+                        "streams": []
 
                     };
                     let buff: Array<Buffer> = [];
@@ -242,7 +242,7 @@ class Formflux {
                     })
 
                     req.on("error", () => {
-                            next(new FormfluxError("Error in recieving request", 500));
+                        next(new FormfluxError("Error in recieving request", 500));
                     })
                 }
             },
@@ -267,7 +267,7 @@ class Formflux {
                         "fieldNameFile": [],
                         "filePath": [],
                         "filesize": [],
-                        "streams":[]
+                        "streams": []
 
                     };
                     let buff: Array<Buffer> = [];
@@ -323,7 +323,7 @@ class Formflux {
                     })
 
                     req.on("error", () => {
-                            next(new FormfluxError("Error in recieving request", 500));
+                        next(new FormfluxError("Error in recieving request", 500));
                     })
                 }
             },
@@ -343,7 +343,7 @@ class Formflux {
                         "fieldNameFile": [],
                         "filePath": [],
                         "filesize": [],
-                        "streams":[]
+                        "streams": []
 
                     };
                     let buff: Array<Buffer> = [];
@@ -399,7 +399,7 @@ class Formflux {
                     })
 
                     req.on("error", () => {
-                            next(new FormfluxError("Error in recieving request", 500));
+                        next(new FormfluxError("Error in recieving request", 500));
                     })
                 }
             },
@@ -419,7 +419,7 @@ class Formflux {
                         "fieldNameFile": [],
                         "filePath": [],
                         "filesize": [],
-                        "streams":[]
+                        "streams": []
 
                     };
                     let buff: Array<Buffer> = [];
@@ -474,80 +474,81 @@ class Formflux {
                     })
 
                     req.on("error", () => {
-                            next(new FormfluxError("Error in recieving request", 500));
+                        next(new FormfluxError("Error in recieving request", 500));
                     })
                 }
             },
         }
     }
 
-     bodyParser(){
-                return async function (req: Request, res: Response, next: NextFunction): Promise<void> {
-                    let obj: reqObj = {
-                        "originalReq": "",
-                        "modifiedReq": Buffer.from(""),
-                        "data": [],
-                        "content": [],
-                        "metaData": [],
-                        "mimeType": [],
-                        "fieldNameBody": [],
-                        "fileName": [],
-                        "modifiedFileName": [],
-                        "contentBody": [],
-                        "fieldNameFile": [],
-                        "filePath": [],
-                        "filesize": [],
-                        "streams":[]
+    bodyParser() {
+        return async function (req: Request, res: Response, next: NextFunction): Promise<void> {
+            let obj: reqObj = {
+                "originalReq": "",
+                "modifiedReq": Buffer.from(""),
+                "data": [],
+                "content": [],
+                "metaData": [],
+                "mimeType": [],
+                "fieldNameBody": [],
+                "fileName": [],
+                "modifiedFileName": [],
+                "contentBody": [],
+                "fieldNameFile": [],
+                "filePath": [],
+                "filesize": [],
+                "streams": []
 
-                    };
-                    let buff: Array<Buffer> = [];
-                    let reqType = req.headers["content-type"];
-                    if (reqType && !reqType.includes("multipart/form-data"))
-                        throw new FormfluxError("Invalid Request Type.Expected multipart/form-data", 400);
+            };
+            let buff: Array<Buffer> = [];
+            let reqType = req.headers["content-type"];
+            if (reqType && !reqType.includes("multipart/form-data"))
+                throw new FormfluxError("Invalid Request Type.Expected multipart/form-data", 400);
 
-                    let boundary = req.headers["content-type"]?.split("boundary=")[1];
+            let boundary = req.headers["content-type"]?.split("boundary=")[1];
 
-                    req.on("data", (chunk: Buffer) => {
-                        buff.push(chunk);
-                    })
-                    req.on("end", () => {
-                        try {
-                            obj.modifiedReq = Buffer.concat(buff); // holding the concatinated buffer
+            req.on("data", (chunk: Buffer) => {
+                buff.push(chunk);
+            })
+            req.on("end", () => {
+                try {
+                    obj.modifiedReq = Buffer.concat(buff); // holding the concatinated buffer
 
-                            obj.data = obj.modifiedReq.toString("binary")?.split(`--${boundary}`); // separating the boundary
-                            obj.data.pop();
-                            obj.data.shift();
+                    obj.data = obj.modifiedReq.toString("binary")?.split(`--${boundary}`); // separating the boundary
+                    obj.data.pop();
+                    obj.data.shift();
 
-                            //*****Defaults*****
-                            //To*********extract content
-                            new ExtractFileContent(obj, null, null, null).extraction();
+                    //*****Defaults*****
+                    //To*********extract content
+                    new ExtractFileContent(obj, null, null, null).extraction();
 
-                            //To*********SetFileDataToReqObj
-                            let writeBool: boolean = false;
-                            let parseBool: boolean = false;
-                            let checkCompletion = (writeComplete: boolean, parsecomplete: boolean) => {
-                                if (writeComplete && parsecomplete)
-                                    next();
-                            }
+                    //To*********SetFileDataToReqObj
+                    let writeBool: boolean = false;
+                    let parseBool: boolean = false;
+                    let checkCompletion = (writeComplete: boolean, parsecomplete: boolean) => {
+                        if (writeComplete && parsecomplete)
+                            next();
+                    }
 
-                            EventHandlers.on("parseEnd", (message) => {
-                                parseBool = true;
-                                next();
-                            })
-
-                            new setContentToBody(obj).setBody(req);
-
-                        } catch (err) {
-                            next(err);
-                        }
+                    EventHandlers.on("parseEnd", (message) => {
+                        parseBool = true;
+                        next();
                     })
 
-                    req.on("error", () => {
-                            next(new FormfluxError("Error in recieving request", 500));
-                    })
+                    new setContentToBody(obj).setBody(req);
+
+                } catch (err) {
+                    next(err);
                 }
+            })
+
+            req.on("error", () => {
+                next(new FormfluxError("Error in recieving request", 500));
+            })
+        }
     }
-    
+
 }
 
 export default Formflux;
+export { FormfluxError, optionFields, options, optionSingle, File };

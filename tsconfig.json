@@ -1,30 +1,20 @@
 {
     "compilerOptions": {
-        "module": "CommonJS",
-        "target": "ES2021",
-        "moduleResolution": "node",
-        "esModuleInterop": true,
-        "sourceMap": true,
-        "outDir": "./dist",
-        "rootDir": "./src",
-        "experimentalDecorators": true,
-        "typeRoots": [
-            "./src/types",
-            "node_modules/@types"
-        ],
-        "types": [
-            "node",
-            "express"
-        ],
-        "emitDecoratorMetadata": true,
-        "declaration": true,
-        "declarationDir": "./dist/declarations"
+      "module": "esnext",
+      "moduleResolution": "node",
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "sourceMap": true,
+      "outDir": "./dist",
+      "rootDir": "./src",
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "declaration": true,
+      "declarationDir": "./dist/types",
+      "typeRoots": ["node_modules/@types"],
+      "lib": ["DOM", "esnext"],
+      "target": "esnext"
     },
-    "exclude": [
-        "node_modules",
-        "dist",
-    ],
-    "include": [
-        "src/**/*.ts"
-    ]
-}
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "dist"]
+  }
