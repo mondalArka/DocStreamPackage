@@ -1,12 +1,28 @@
 {
   "name": "formflux",
-  "version": "0.0.1",
+  "version": "0.1.9",
   "description": "A package to upload files to a server and parsing multipart-formData requests",
-  "main": "./dist/FormFlux.js",
-  "scripts": {
-    "build": "rm -rf dist && tsc --project tsconfig.json && echo 'Built successfully'"
+  "main": "./dist/cjs/FormFlux.js",
+  "module": "./dist/esm/FormFlux.js",
+  "types": "./dist/types/FormFlux.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/FormFlux.d.ts",
+        "default": "./dist/esm/FormFlux.js"
+      },
+      "require": {
+        "types": "./dist/types/FormFlux.d.ts",
+        "default": "./dist/cjs/FormFlux.js"
+      }
+    }
   },
-  "types": "./dist/declarations/FormFlux.d.ts",
+  "scripts": {
+    "build": "npm run build:cjs && npm run build:esm && npm run build:types && node script/babel-package.js",
+    "build:cjs": "BABEL_ENV=cjs babel src --presets=./script/babel-preset.js --extensions .ts,.tsx --ignore src/**/*.specs.tsx --out-dir dist/cjs --source-maps",
+    "build:esm": "BABEL_ENV=esm babel src --presets=./script/babel-preset.js --extensions .ts,.tsx --ignore src/**/*.specs.tsx --out-dir dist/esm --source-maps",
+    "build:types": "tsc --emitDeclarationOnly --outDir dist/types"
+  },
   "keywords": [
     "FormFlux",
     "formflux",
@@ -35,7 +51,25 @@
   ],
   "author": "Arka",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mondalArka/DocStreamPackage.git"
+  },
   "engines": {
     "node": ">=14.0.0"
-  }
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.24.1",
+    "@babel/preset-env": "^7.24.3",
+    "@babel/preset-typescript": "^7.24.1",
+    "@types/express": "^5.0.3",
+    "@types/node": "^18.11.18",
+    "typescript": "^5.8.3"
+  },
+  "files": [
+    "dist/cjs",
+    "dist/esm",
+    "dist/types",
+    "dist/package.json"
+  ]
 }

@@ -17,21 +17,23 @@ FormFlux focuses on giving developers greater control over file validation, pars
 
 ---
 
+## Setup
+1. **Type `CommonJs`**
+```js
+const FormFlux = require('formflux').default;
+```
+2. **Type `module`**
+```ts
+import Formflux from "formflux";
+```
+
 ## Code Example
 
 ```ts
-import express, { Request } from "express";
-import path from "path";
-import { FormFlux } from "formflux";
-import { File } from "./FormFlux.Types"; // adjust the path as needed
-import FormfluxError from "./FormFluxError"; // adjust the path as needed
-
-const router = express.Router();
-
 // Step 1: Configure memory storage or disk storage with options
-const formFluxConfig = FormFlux.memoryStorage({
+const formFluxConfig = FormFlux.diskStorage({
   attachFileToReqBody: true, // global behavior
-  maxFields: 2,
+  maxFields: 2, // including file fields
   maxFileCount: 3,
   minFileCount: 1,
   maxFileSize: 580 * 1024, // 580KB
@@ -59,7 +61,7 @@ const formFluxConfig = FormFlux.memoryStorage({
 });
 
 // Step 2: Use in route like multer
-router.post(
+app.post(
   "/upload",
   formFluxConfig.fields([
     { name: "avatar", maxFileCount: 2, minFileCount: 1, maxFileSize: 100 * 1024 },
@@ -67,24 +69,23 @@ router.post(
   ]),
   async (req, res) => {
     console.log("Files:", req.files);
-    console.log("Body:", req.body); // Includes filenames if enabled
+    console.log("File",req.file);
+    console.log("Body:", req.body);
 
-    res.json({ message: "Files uploaded successfully" });
+    res.status(200).json({ message: "Files uploaded successfully" });
   }
 );
-
-export default router;
 ```
 
-## Why FormFlux Instead of Multer?
+## FormFlux Features
 
-Here are some of the unique advantages FormFlux provides over Multer:
+Here are some of the features of FormFlux:
 
 1. **Attach Filenames to `req.body`**
-   - Unlike Multer, FormFlux automatically attaches the uploaded filename to the `req.body` – helpful when saving file metadata to a database.This behavior is enabled when the attachFileToReqBody: true option is set.
+   - FormFlux attaches the uploaded filename to the `req.body` – helpful when saving file metadata to a database.This behavior is enabled when the attachFileToReqBody: true option is set.
 
 2. **File Count Validation**
-   - Enforce `minFileCount` and `maxFileCount` of files **per field** and **globally**. Multer only supports `maxCount`.
+   - Enforce `minFileCount`, `maxFileCount` and `maxFileSize` of files **per field** and **globally**.
 
 3. **File Filtering**
    - Filter incoming files based on:
@@ -106,14 +107,17 @@ Here are some of the unique advantages FormFlux provides over Multer:
 6. **Flexible Middleware API**
    - Just like Multer:
      - `formflux.single(fieldname)`
-     - `formflux.fields([{ name, maxCount }])`
+     - `formflux.fields([{ name, maxFileCount, minFileCount, maxFileSize }])`
      - `formflux.any()`
-     - `formflux.bodyParser()` – for parsing non-file fields
+     - `new formflux().bodyParser()` – for parsing non-file fields
 
 7. **Storage Options**
    - Supports `memoryStorage` and `diskStorage`, giving you full control over where and how files are saved.
 
 ---
+
+8. **Error Handling**
+    - Provides error handling through error class FormfluxError which also provides statuscodes. Similar to Multer error class.
 
 ## Limitation
 
