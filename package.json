@@ -1,6 +1,6 @@
 {
   "name": "formflux",
-  "version": "0.1.9",
+  "version": "0.2.18",
   "description": "A package to upload files to a server and parsing multipart-formData requests",
   "main": "./dist/cjs/FormFlux.js",
   "module": "./dist/esm/FormFlux.js",
@@ -18,10 +18,11 @@
     }
   },
   "scripts": {
-    "build": "npm run build:cjs && npm run build:esm && npm run build:types && node script/babel-package.js",
-    "build:cjs": "BABEL_ENV=cjs babel src --presets=./script/babel-preset.js --extensions .ts,.tsx --ignore src/**/*.specs.tsx --out-dir dist/cjs --source-maps",
-    "build:esm": "BABEL_ENV=esm babel src --presets=./script/babel-preset.js --extensions .ts,.tsx --ignore src/**/*.specs.tsx --out-dir dist/esm --source-maps",
-    "build:types": "tsc --emitDeclarationOnly --outDir dist/types"
+    "build": "npm run build:cjs && npm run build:esm && npm run build:types && node script/babel-package.js && npm run copy-types",
+    "build:cjs": "cross-env BABEL_ENV=cjs babel src --presets=./script/babel-preset.js --extensions .ts,.tsx --ignore src/**/*.specs.tsx --out-dir dist/cjs --source-maps",
+    "build:esm": "cross-env BABEL_ENV=esm babel src --presets=./script/babel-preset.js --extensions .ts,.tsx --ignore src/**/*.specs.tsx --out-dir dist/esm --source-maps",
+    "build:types": "tsc --emitDeclarationOnly --outDir dist/types",
+    "copy-types": "copyfiles -u 1 src/index.d.ts dist/types"
   },
   "keywords": [
     "FormFlux",
@@ -62,14 +63,13 @@
     "@babel/cli": "^7.24.1",
     "@babel/preset-env": "^7.24.3",
     "@babel/preset-typescript": "^7.24.1",
-    "@types/express": "^5.0.3",
+    "@types/express": "^5.0.6",
     "@types/node": "^18.11.18",
+    "copyfiles": "^2.4.1",
+    "cross-env": "^10.1.0",
     "typescript": "^5.8.3"
   },
   "files": [
-    "dist/cjs",
-    "dist/esm",
-    "dist/types",
-    "dist/package.json"
+    "dist"
   ]
 }

@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { options, reqObj, optionFields, optionSingle, File } from "./FormFlux.Types";
 import ExtractFileContent from "./ExtractContent";
 import writeFileContent from "./WriteFileContent";
