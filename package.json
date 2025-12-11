@@ -8,13 +8,12 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/types/FormFlux.d.ts",
         "default": "./dist/esm/FormFlux.js"
       },
       "require": {
-        "types": "./dist/types/FormFlux.d.ts",
         "default": "./dist/cjs/FormFlux.js"
-      }
+      },
+      "types": "./dist/types/FormFlux.d.ts"
     }
   },
   "scripts": {
