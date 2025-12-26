@@ -119,6 +119,16 @@ Here are some of the features of FormFlux:
 8. **Error Handling**
     - Provides error handling through error class FormfluxError which also provides statuscodes. Similar to Multer error class.
 
+## TypeScript: Enabling `req.file` and `req.files`
+
+Formflux augments the Express `Request` object with `file` and `files`.
+
+To enable typing if not bale to access files or file from Request object, add this line to a global type declaration file in your project (e.g., `src/types/formflux.d.ts` or any `.d.ts` file included in `tsconfig.json`):
+
+```ts
+import "formflux";
+```
+
 ## Limitation
 
 Due to its custom implementation (not using `busboy`), the recommended **maximum file size is 200MB**. Going beyond that may lead to performance issues or high memory usage.

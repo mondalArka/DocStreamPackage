@@ -8,6 +8,38 @@ import populateReqObj from "./setDatatoReqobj";
 import EventHandlers from "./EventHandlers";
 import FormfluxError from "./FormFluxError";
 
+declare module "express-serve-static-core" {
+  interface Request {
+    file?: {
+      mimetype: string,
+      originalname: string,
+      filesize: number,
+      filename: string,
+      fieldname: string,
+      filepath?: string,
+      buffer?: Buffer
+    };
+    files?: Array<{
+      mimetype: string,
+      originalname: string,
+      filesize: number,
+      filename: string,
+      fieldname: string,
+      filepath?: string,
+      buffer?: Buffer
+    }> | {
+      [fieldname: string]: Array<{
+        mimetype: string,
+        originalname: string,
+        filename: string,
+        filesize: number,
+        fieldname: string,
+        filepath?: string,
+        buffer?: Buffer
+      }>
+    };
+  }
+}
 class Formflux {
 
     static diskStorage(options: options) {
