@@ -1,10 +1,11 @@
 import { Request } from "express";
-import { options, optionSingle, reqObj } from "./FormFlux.Types";
+import { CompressionPresetName, configOptions, options, optionSingle, reqObj } from "./FormFlux.Types";
 import { createWriteStream, existsSync, unlinkSync } from "fs";
 import FormfluxError from "./FormFluxError";
 import setFileContentToReq from "./SetFileContentToReqFile";
 import EventHandlers from "./EventHandlers";
 import path from "path";
+import compress from "./compression";
 class writeFileContent {
 
     private obj: reqObj
@@ -12,6 +13,7 @@ class writeFileContent {
     private req: Request;
     private for: "any" | "fields" | "single";
     private storage: "memory" | "disk";
+    private compressionType: null | configOptions = null;
     constructor(req: Request, obj: reqObj, options: options | optionSingle, forReason: "any" | "fields" | "single", storage: "memory" | "disk") {
         this.obj = obj;
         this.options = options;
@@ -21,7 +23,8 @@ class writeFileContent {
 
     }
 
-    writeContent(): void {
+    writeContent(compressionType?: configOptions): void {
+        this.compressionType = compressionType;
         let flag = 0;
         if (this.obj.content.length > 0) {
             for (let i = 0; i < this.obj.metaData.length; i++)
@@ -50,7 +53,7 @@ class writeFileContent {
         if (!access) throw new FormfluxError("Invalid file", 400);
 
         this.options.filename(this.req, { originalname: fileName, mimetype: metaData.split("Content-Type: ")[1], filesize, fieldname }, (error: FormfluxError | null, fileName: string) => {
-            this.callBackFilename(error, fileName);
+            this.callBackFilename(error, this.compressionType?.compression ? `${fileName}.gz` : fileName);
         })
 
         this.obj.fileName.push(fileName);
@@ -90,11 +93,18 @@ class writeFileContent {
                 fieldname
             );
         } else if (this.for == "single") {
+            // have to set content here after compresiion to send i to req obj
+            if (this.compressionType && this.compressionType?.compression) {
+                if (Buffer.from(content).length > 10 * 1024 * 1024)
+                    throw new FormfluxError("File size too large to compress. Max size is 10MB", 400);
+
+                content = compress(content, this.compressionType?.compression); // content.length needs to be done to check the size after compression
+            }
             new setFileContentToReq(this.req, this.obj, "single", this.storage).setFileNames(
                 {
                     originalname: fileName, mimetype: metaData.split("Content-Type: ")[1],
                     filepath: this.obj.filePath[count],
-                    filesize: Buffer.from(content).length,
+                    filesize: Buffer.from(content).length, // length needs to be checked 
                     filename: `${this.obj.modifiedFileName[count]}`,
                     fieldname,
                     buffer: content

@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { options, reqObj, optionFields, optionSingle, File } from "./FormFlux.Types";
+import { options, reqObj, optionFields, optionSingle, File, CompressionPresetName, configOptions } from "./FormFlux.Types";
 import ExtractFileContent from "./ExtractContent";
 import writeFileContent from "./WriteFileContent";
 import setContentToBody from "./SetBodyContentToReq";
@@ -9,36 +9,36 @@ import EventHandlers from "./EventHandlers";
 import FormfluxError from "./FormFluxError";
 
 declare module "express-serve-static-core" {
-  interface Request {
-    file?: {
-      mimetype: string,
-      originalname: string,
-      filesize: number,
-      filename: string,
-      fieldname: string,
-      filepath?: string,
-      buffer?: Buffer
-    };
-    files?: Array<{
-      mimetype: string,
-      originalname: string,
-      filesize: number,
-      filename: string,
-      fieldname: string,
-      filepath?: string,
-      buffer?: Buffer
-    }> | {
-      [fieldname: string]: Array<{
-        mimetype: string,
-        originalname: string,
-        filename: string,
-        filesize: number,
-        fieldname: string,
-        filepath?: string,
-        buffer?: Buffer
-      }>
-    };
-  }
+    interface Request {
+        file?: {
+            mimetype: string,
+            originalname: string,
+            filesize: number,
+            filename: string,
+            fieldname: string,
+            filepath?: string,
+            buffer?: Buffer
+        };
+        files?: Array<{
+            mimetype: string,
+            originalname: string,
+            filesize: number,
+            filename: string,
+            fieldname: string,
+            filepath?: string,
+            buffer?: Buffer
+        }> | {
+            [fieldname: string]: Array<{
+                mimetype: string,
+                originalname: string,
+                filename: string,
+                filesize: number,
+                fieldname: string,
+                filepath?: string,
+                buffer?: Buffer
+            }>
+        };
+    }
 }
 class Formflux {
 
@@ -98,13 +98,12 @@ class Formflux {
                             EventHandlers.on("parseEnd", (message) => {
                                 parseBool = true;
                                 checkCompletion(writeBool, parseBool);
-                            })
+                            });
 
                             EventHandlers.on("writeEnd", (message) => {
                                 writeBool = true;
                                 checkCompletion(writeBool, parseBool);
-                            })
-
+                            });
 
                             new writeFileContent(req, obj, options, "any", "disk").writeContent();
                             if (options.attachFileToReqBody && options.attachFileToReqBody == true)
@@ -202,7 +201,7 @@ class Formflux {
                 }
             },
 
-            single(field: string) {
+            single(field: string, compression?: configOptions) {
                 return async function (req: Request, res: Response, next: NextFunction): Promise<void> {
                     let obj: reqObj = {
                         "originalReq": "",
@@ -263,7 +262,7 @@ class Formflux {
                             })
 
 
-                            new writeFileContent(req, obj, options, "single", "disk").writeContent();
+                            new writeFileContent(req, obj, options, "single", "disk").writeContent(compression);
                             if (options.attachFileToReqBody && options.attachFileToReqBody == true)
                                 new setFileNameToBody(obj).setFileNames(req);
 
