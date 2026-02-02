@@ -434,7 +434,7 @@ class Formflux {
                     })
                 }
             },
-            single(field: string) {
+            single(field: string, compression?: configOptions) {
                 return async function (req: Request, res: Response, next: NextFunction): Promise<void> {
                     let obj: reqObj = {
                         "originalReq": "",
@@ -494,7 +494,7 @@ class Formflux {
                                 checkCompletion(writeBool, parseBool);
                             })
 
-                            new writeFileContent(req, obj, options, "single", "memory").writeContent();
+                            new writeFileContent(req, obj, options, "single", "memory").writeContent(compression);
                             if (options.attachFileToReqBody && options.attachFileToReqBody == true)
                                 new setFileNameToBody(obj).setFileNames(req);
 
